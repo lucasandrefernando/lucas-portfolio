@@ -65,7 +65,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold mb-1">Email</h3>
-                  <p className="text-gray-300">lucas.andre@example.com</p>
+                  <p className="text-gray-300">lucasandre.sanos@gmail.com</p>
                 </div>
               </div>
 
@@ -95,12 +95,12 @@ export default function ContactSection() {
                 <div>
                   <h3 className="text-lg font-bold mb-1">GitHub</h3>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/lucasandrefernando"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 transition-colors"
                   >
-                    github.com/lucas-andre
+                    github.com/lucasandrefernando
                   </a>
                 </div>
               </div>
@@ -113,12 +113,12 @@ export default function ContactSection() {
                 <div>
                   <h3 className="text-lg font-bold mb-1">WhatsApp</h3>
                   <a
-                    href="https://wa.me/5531999999999"
+                    href="https://wa.me/5531995420887"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 transition-colors"
                   >
-                    +55 (31) 99999-9999
+                    +55 (31) 99542-0887
                   </a>
                 </div>
               </div>
@@ -137,7 +137,7 @@ export default function ContactSection() {
                   <Linkedin className="w-6 h-6 text-blue-400" />
                 </a>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/lucasandrefernando"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
@@ -145,7 +145,7 @@ export default function ContactSection() {
                   <Github className="w-6 h-6 text-blue-400" />
                 </a>
                 <a
-                  href="mailto:lucas@example.com"
+                  href="mailto:lucasandre.sanos@gmail.com"
                   className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
                 >
                   <Mail className="w-6 h-6 text-blue-400" />
@@ -184,7 +184,7 @@ export default function ContactSection() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="seu@email.com"
+                  placeholder="lucasandre.sanos@gmail.com"
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
