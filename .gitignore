@@ -107,3 +107,9 @@ temp/
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
+
+# Claude Code
+.claude/
+
+# Manus logs
+.manus-logs/

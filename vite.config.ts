@@ -168,8 +168,8 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    port: 3000,
-    strictPort: false, // Will find next available port if 3000 is busy
+    port: 21017,
+    strictPort: true, // Use exactly port 21017
     host: true,
     allowedHosts: [
       ".manuspre.computer",

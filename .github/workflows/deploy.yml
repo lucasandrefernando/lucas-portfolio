@@ -1,4 +1,4 @@
-name: Build and Deploy to KingHost FTP
+name: Build and Deploy to KingHost
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
@@ -30,27 +30,44 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Deploy to KingHost via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Upload index.js via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_PATH }}/
-          protocol: ftp
-          dangerous-clean-slate: true
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          source: "dist/index.js"
+          target: "/home/anacron/apps_nodejs/portfolio"
+          strip_components: 1
+
+      - name: Upload public/ via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          source: "dist/public/"
+          target: "/home/anacron/apps_nodejs/portfolio"
+          strip_components: 1
+
+      - name: Restart app via PM2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            pm2 restart all --update-env
+            pm2 save
 
       - name: Deployment Status
         if: always()
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deploy concluido!"
-            echo "🌐 https://portfolio.anacron.com.br"
+            echo "Deploy concluido com sucesso!"
           else
-            echo "❌ Deploy falhou!"
+            echo "Deploy falhou!"
           fi
