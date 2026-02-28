@@ -28,19 +28,21 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: apps_nodejs/portfolio/
-          protocol: ftp
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+      - name: Deploy via lftp
+        run: |
+          sudo apt-get install -y lftp
+          lftp -u "${{ secrets.FTP_USER }},${{ secrets.FTP_PASSWORD }}" \
+            -e "
+              set ftp:passive-mode on;
+              set ssl:verify-certificate no;
+              mirror -R --parallel=5 \
+                --exclude-glob .git/ \
+                --exclude-glob .gitkeep \
+                --exclude-glob __manus__/ \
+                ./dist/ apps_nodejs/portfolio/;
+              bye
+            " \
+            ftp://${{ secrets.FTP_HOST }}
 
       - name: Deployment Status
         if: always()
