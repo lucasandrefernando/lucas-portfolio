@@ -28,32 +28,119 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Deploy to KingHost via FTP
+      - name: Deploy via FTP
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          FTP_BASE="ftp://${FTP_USER}:${FTP_PASSWORD}@${FTP_HOST}/apps_nodejs/portfolio"
+          python3 - << 'PYEOF'
+          import ftplib, os, pathlib, ssl, sys
 
-          upload_file() {
-            local local_path="$1"
-            local remote_path="$2"
-            echo "Uploading: $remote_path"
-            curl -s --ftp-create-dirs -T "$local_path" \
-              "${FTP_BASE}/${remote_path}" 2>&1
-          }
+          host     = os.environ['FTP_HOST']
+          user     = os.environ['FTP_USER']
+          password = os.environ['FTP_PASSWORD']
+
+          # ── Connect (plain FTP first, then FTPS) ──────────────────────────────
+          ftp = None
+          for use_tls in [False, True]:
+              label = 'FTPS' if use_tls else 'FTP'
+              try:
+                  if use_tls:
+                      ctx = ssl.create_default_context()
+                      ctx.check_hostname = False
+                      ctx.verify_mode = ssl.CERT_NONE
+                      ftp = ftplib.FTP_TLS(context=ctx, timeout=30)
+                  else:
+                      ftp = ftplib.FTP(timeout=30)
+                  ftp.connect(host, 21)
+                  ftp.login(user, password)
+                  if use_tls:
+                      ftp.prot_p()
+                  print(f"Connected via {label}")
+                  break
+              except Exception as e:
+                  print(f"{label} failed: {e}")
+                  ftp = None
+
+          if not ftp:
+              print("Cannot connect to FTP server")
+              sys.exit(1)
+
+          # ── Show root listing ─────────────────────────────────────────────────
+          print("\n=== FTP Root Listing ===")
+          try:
+              ftp.retrlines('LIST', lambda l: print(f"  {l}"))
+          except Exception as e:
+              print(f"  (listing failed: {e})")
+
+          # ── Navigate to deployment directory ──────────────────────────────────
+          print("\n=== Navigating to apps_nodejs/portfolio ===")
+          for part in ['apps_nodejs', 'portfolio']:
+              try:
+                  ftp.cwd(part)
+                  print(f"  CWD {part}: OK")
+              except ftplib.error_perm as e:
+                  if str(e).startswith('550'):
+                      try:
+                          ftp.mkd(part)
+                          ftp.cwd(part)
+                          print(f"  MKD+CWD {part}: OK")
+                      except Exception as e2:
+                          print(f"  Cannot access or create '{part}': {e2}")
+                          sys.exit(1)
+                  else:
+                      print(f"  CWD {part} error: {e}")
+                      sys.exit(1)
+
+          # ── Upload files ──────────────────────────────────────────────────────
+          print("\n=== Uploading files ===")
 
           # Upload server bundle
-          upload_file "dist/index.js" "index.js"
+          try:
+              with open('dist/index.js', 'rb') as f:
+                  ftp.storbinary('STOR index.js', f)
+              print("  index.js: OK")
+          except Exception as e:
+              print(f"  index.js: FAILED - {e}")
+              sys.exit(1)
 
-          # Upload all files from dist/public recursively
-          find dist/public -type f | while read file; do
-            relative="${file#dist/public/}"
-            upload_file "$file" "public/${relative}"
-          done
+          # Recursive upload of a local directory into the current FTP directory
+          def upload_dir(local: pathlib.Path):
+              for item in sorted(local.iterdir()):
+                  if item.is_file():
+                      try:
+                          with open(item, 'rb') as f:
+                              ftp.storbinary(f'STOR {item.name}', f)
+                          print(f"  {item.relative_to(pathlib.Path('dist'))}: OK")
+                      except Exception as e:
+                          print(f"  {item.name}: FAILED - {e}")
+                  elif item.is_dir():
+                      try:
+                          ftp.cwd(item.name)
+                      except ftplib.error_perm:
+                          try:
+                              ftp.mkd(item.name)
+                              ftp.cwd(item.name)
+                          except Exception as e:
+                              print(f"  Cannot enter dir '{item.name}': {e}")
+                              continue
+                      print(f"  [{item.name}/]")
+                      upload_dir(item)
+                      ftp.cwd('..')
 
-          echo "Deploy concluido!"
+          # Enter (or create) public/ and upload recursively
+          try:
+              ftp.cwd('public')
+          except ftplib.error_perm:
+              ftp.mkd('public')
+              ftp.cwd('public')
+          print("  [public/]")
+          upload_dir(pathlib.Path('dist/public'))
+
+          ftp.quit()
+          print("\nDeploy complete!")
+          PYEOF
 
       - name: Deployment Status
         if: always()
