@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,23 +11,27 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Serve static files from dist/public in production
-  const staticPath =
-    process.env.NODE_ENV === "production"
-      ? path.resolve(__dirname, "public")
-      : path.resolve(__dirname, "..", "dist", "public");
+  // Auto-detecta caminho dos arquivos estáticos (funciona em dev e na KingHost)
+  const productionPath = path.resolve(__dirname, "public");
+  const devPath = path.resolve(__dirname, "..", "dist", "public");
+  const staticPath = fs.existsSync(path.join(productionPath, "index.html"))
+    ? productionPath
+    : devPath;
 
   app.use(express.static(staticPath));
 
-  // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
-  const port = process.env.PORT || 3000;
+  // KingHost usa PORT_NOMEDOSCRIPT (ex: PORT_INDEX para index.js)
+  // Esta lógica detecta automaticamente qualquer variável PORT_*
+  const kingHostPort = Object.entries(process.env)
+    .find(([key]) => key.startsWith("PORT_"))?.[1];
+  const port = kingHostPort || process.env.PORT || 3000;
 
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Server running on port ${port}`);
   });
 }
 
