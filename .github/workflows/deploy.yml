@@ -28,27 +28,32 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Diagnose FTP with curl
+      - name: Deploy to KingHost via FTP
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          echo "test" > /tmp/test.txt
+          FTP_BASE="ftp://${FTP_USER}:${FTP_PASSWORD}@${FTP_HOST}/apps_nodejs/portfolio"
 
-          echo "=== Test 1: plain FTP ==="
-          curl -v --ftp-create-dirs -T /tmp/test.txt \
-            "ftp://${FTP_USER}:${FTP_PASSWORD}@${FTP_HOST}/test.txt" 2>&1 | head -60 || true
+          upload_file() {
+            local local_path="$1"
+            local remote_path="$2"
+            echo "Uploading: $remote_path"
+            curl -s --ftp-create-dirs -T "$local_path" \
+              "${FTP_BASE}/${remote_path}" 2>&1
+          }
 
-          echo ""
-          echo "=== Test 2: FTPS explicit (--ftp-ssl) ==="
-          curl -v --ftp-create-dirs --ftp-ssl -k -T /tmp/test.txt \
-            "ftp://${FTP_USER}:${FTP_PASSWORD}@${FTP_HOST}/test.txt" 2>&1 | head -60 || true
+          # Upload server bundle
+          upload_file "dist/index.js" "index.js"
 
-          echo ""
-          echo "=== Test 3: FTPS only (--ssl-reqd) ==="
-          curl -v --ftp-create-dirs --ssl-reqd -k -T /tmp/test.txt \
-            "ftp://${FTP_USER}:${FTP_PASSWORD}@${FTP_HOST}/test.txt" 2>&1 | head -60 || true
+          # Upload all files from dist/public recursively
+          find dist/public -type f | while read file; do
+            relative="${file#dist/public/}"
+            upload_file "$file" "public/${relative}"
+          done
+
+          echo "Deploy concluido!"
 
       - name: Deployment Status
         if: always()
