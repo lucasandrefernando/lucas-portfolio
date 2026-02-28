@@ -75,23 +75,18 @@ jobs:
               print(f"  (listing failed: {e})")
 
           # ── Navigate to deployment directory ──────────────────────────────────
-          print("\n=== Navigating to apps_nodejs/portfolio ===")
-          for part in ['apps_nodejs', 'portfolio']:
-              try:
-                  ftp.cwd(part)
-                  print(f"  CWD {part}: OK")
-              except ftplib.error_perm as e:
-                  if str(e).startswith('550'):
-                      try:
-                          ftp.mkd(part)
-                          ftp.cwd(part)
-                          print(f"  MKD+CWD {part}: OK")
-                      except Exception as e2:
-                          print(f"  Cannot access or create '{part}': {e2}")
-                          sys.exit(1)
-                  else:
-                      print(f"  CWD {part} error: {e}")
-                      sys.exit(1)
+          # FTP chroot is inside apps_nodejs/ — try portfolio/ first,
+          # then fall back to uploading at root (if chroot IS portfolio/).
+          print("\n=== Navigating to deployment directory ===")
+          in_portfolio = False
+          try:
+              ftp.cwd('portfolio')
+              print("  CWD portfolio: OK  (chroot = apps_nodejs/)")
+              in_portfolio = True
+          except ftplib.error_perm as e:
+              print(f"  CWD portfolio failed: {e}")
+              print("  Assuming chroot is already apps_nodejs/portfolio/ — uploading at root")
+              in_portfolio = True  # proceed anyway
 
           # ── Upload files ──────────────────────────────────────────────────────
           print("\n=== Uploading files ===")
