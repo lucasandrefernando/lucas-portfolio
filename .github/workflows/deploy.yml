@@ -30,19 +30,6 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Add production package.json to deploy
-        run: |
-          cat > dist/package.json << 'EOF'
-          {
-            "name": "lucas_portfolio",
-            "version": "1.0.0",
-            "type": "module",
-            "dependencies": {
-              "express": "^4.21.2"
-            }
-          }
-          EOF
-
       - name: Deploy to KingHost via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -52,7 +39,7 @@ jobs:
           local-dir: ./dist/
           server-dir: ${{ secrets.FTP_PATH }}/
           protocol: ftp
-          dangerous-clean-slate: false
+          dangerous-clean-slate: true
           exclude: |
             **/.git*
             **/.git*/**
