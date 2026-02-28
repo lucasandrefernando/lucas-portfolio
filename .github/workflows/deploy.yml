@@ -39,7 +39,13 @@ jobs:
           cat > /tmp/deploy.lftp << EOF
           set ftp:passive-mode on
           set ssl:verify-certificate no
+          set ftp:use-feat no
+          set net:max-retries 3
           open -u ${FTP_USER},${FTP_PASSWORD} ftp://${FTP_HOST}
+          mkdir -pf apps_nodejs
+          mkdir -pf apps_nodejs/portfolio
+          mkdir -pf apps_nodejs/portfolio/public
+          mkdir -pf apps_nodejs/portfolio/public/assets
           mirror -R --parallel=5 \
             --exclude-glob .git/ \
             --exclude-glob .gitkeep \
