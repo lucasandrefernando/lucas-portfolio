@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build-and-deploy:
@@ -16,22 +13,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'pnpm'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build project
         run: pnpm build
+
+      - name: Add production package.json to deploy
+        run: |
+          cat > dist/package.json << 'EOF'
+          {
+            "name": "lucas_portfolio",
+            "version": "1.0.0",
+            "type": "module",
+            "dependencies": {
+              "express": "^4.21.2"
+            }
+          }
+          EOF
 
       - name: Deploy to KingHost via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -52,8 +62,8 @@ jobs:
         if: always()
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment successful!"
-            echo "🌐 Site updated at: https://anacron.com.br"
+            echo "✅ Deploy concluido!"
+            echo "🌐 https://portfolio.anacron.com.br"
           else
-            echo "❌ Deployment failed!"
+            echo "❌ Deploy falhou!"
           fi
