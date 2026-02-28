@@ -28,52 +28,40 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Debug FTP root structure
+      - name: Debug FTP structure and deploy
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          sudo apt-get install -y lftp
+          python3 << 'PYEOF'
+          import ftplib, os, sys
 
-          cat > /tmp/debug.lftp << EOF
-          set ftp:passive-mode on
-          set ssl:verify-certificate no
-          set ftp:use-feat no
-          open -u ${FTP_USER},${FTP_PASSWORD} ftp://${FTP_HOST}
-          echo "=== FTP ROOT ==="
-          ls
-          echo "=== PWD ==="
-          pwd
-          bye
-          EOF
+          host = os.environ['FTP_HOST']
+          user = os.environ['FTP_USER']
+          password = os.environ['FTP_PASSWORD']
 
-          lftp -f /tmp/debug.lftp
+          print(f"=== Connecting to {host}:21 ===")
+          ftp = ftplib.FTP()
+          ftp.connect(host, 21, timeout=30)
+          ftp.login(user, password)
+          print(f"Connected! Root pwd: {ftp.pwd()}")
 
-      - name: Deploy via lftp
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          cat > /tmp/deploy.lftp << EOF
-          set ftp:passive-mode on
-          set ssl:verify-certificate no
-          set ftp:use-feat no
-          set net:max-retries 3
-          open -u ${FTP_USER},${FTP_PASSWORD} ftp://${FTP_HOST}
-          mkdir -pf portfolio
-          mkdir -pf portfolio/public
-          mkdir -pf portfolio/public/assets
-          mirror -R --parallel=5 \
-            --exclude-glob .git/ \
-            --exclude-glob .gitkeep \
-            --exclude-glob __manus__/ \
-            ./dist/ portfolio/
-          bye
-          EOF
+          print("\n=== Root listing ===")
+          ftp.dir()
 
-          lftp -f /tmp/deploy.lftp
+          for path in ['apps_nodejs', 'portfolio', 'apps_nodejs/portfolio']:
+              try:
+                  ftp.cwd('/')
+                  ftp.cwd(path)
+                  print(f"\n=== cd {path} OK — pwd: {ftp.pwd()} ===")
+                  ftp.dir()
+              except Exception as e:
+                  print(f"cd {path} FAILED: {e}")
+
+          ftp.quit()
+          print("\n=== Done ===")
+          PYEOF
 
       - name: Deployment Status
         if: always()
