@@ -39,6 +39,96 @@ async function startServer() {
     ? productionPath
     : devPath;
 
+  // ── Chat IA ───────────────────────────────────────────────────────────────
+  const SYSTEM_PROMPT = `Você é Lucas André Fernando, desenvolvedor Full Stack com 10+ anos de experiência baseado em Belo Horizonte, MG. Responda perguntas sobre sua carreira em primeira pessoa, de forma natural e profissional.
+
+Dados principais:
+- Empresa atual: Eagle Telecom (Desenvolvedor Full Stack, desde setembro de 2025)
+- Stack: PHP Sênior, React, Node.js, MySQL, JavaScript, Docker, Linux
+- Diferencial: visão sistêmica completa (veio de infraestrutura de TI) + uso real de IA no fluxo de trabalho
+- Formação: Sistemas de Informação — Anhanguera Educacional (2012-2016)
+- Contato: lucas@anacron.com.br | WhatsApp: +55 (31) 99542-0887
+- LinkedIn: linkedin.com/in/lucas-andre-fernando
+- GitHub: github.com/lucasandrefernando
+
+Histórico profissional:
+- Eagle Telecom: Dev Full Stack (Set 2025–atual) e Técnico de Suporte II (Jan 2023–Set 2025)
+- Telemont: Gestor de Informação — Power BI, SQL, dashboards (Jun 2021–Dez 2022)
+- Decminas: Analista de Infraestrutura de TI — redes, servidores, segurança (Mar 2020–Mai 2021)
+
+Projetos em produção:
+- Plataforma de Gestão Operacional Hospitalar (Hospital Madre Teresa) — PHP, MySQL, JS, Bootstrap
+- Dashboard BI para Contact Center (Bernoulli) — PHP, MySQL, Chart.js
+- Sistema de Controle de Estoque (Eagle Telecom) — PHP, MySQL
+- Site Institucional Eagle Telecom — HTML, CSS, JS, PHP
+- Sistema de Gestão de Materiais (Telemont) — PHP, MySQL
+- App de Controle Financeiro Pessoal — React, Node.js, MySQL, Tailwind
+
+Diretrizes:
+- Responda em português (ou no idioma do usuário)
+- Seja direto e amigável, respostas concisas (máximo 3 parágrafos)
+- Para orçamento ou contratação, sugira contato pelo WhatsApp ou email
+- Não invente informações que não foram fornecidas acima`;
+
+  const chatLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Muitas mensagens. Aguarde 15 minutos." },
+  });
+
+  app.post("/api/chat", chatLimiter, async (req, res) => {
+    const { messages } = req.body ?? {};
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "Mensagens inválidas." });
+    }
+    if (messages.length > 20) {
+      return res.status(400).json({ error: "Histórico muito longo." });
+    }
+    for (const m of messages) {
+      if (!["user", "assistant"].includes(m?.role) || typeof m?.content !== "string" || m.content.length > 2000) {
+        return res.status(400).json({ error: "Formato de mensagem inválido." });
+      }
+    }
+
+    const groqKey = process.env.GROQ_API_KEY;
+    if (!groqKey) {
+      console.error("[chat] GROQ_API_KEY não configurado");
+      return res.status(503).json({ error: "Serviço de chat não disponível." });
+    }
+
+    try {
+      const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${groqKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+          max_tokens: 500,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!groqRes.ok) {
+        const err = await groqRes.text();
+        console.error("[chat] Groq API error:", err);
+        return res.status(502).json({ error: "Erro ao processar sua mensagem." });
+      }
+
+      const data = await groqRes.json() as any;
+      const reply = data.choices?.[0]?.message?.content ?? "";
+      res.json({ reply });
+    } catch (err) {
+      console.error("[chat] Erro:", err);
+      res.status(500).json({ error: "Erro interno. Tente novamente." });
+    }
+  });
+
   // ── Contato ──────────────────────────────────────────────────────────────
   const contactLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos

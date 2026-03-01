@@ -9,6 +9,7 @@ import ExperienceSection from "./components/ExperienceSection";
 import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
+import ChatWidget from "./components/ChatWidget";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <ProjectsSection />
           <ContactSection />
           <Footer />
+          <ChatWidget />
         </div>
       </TooltipProvider>
     </ThemeProvider>
