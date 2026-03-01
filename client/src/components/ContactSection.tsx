@@ -3,7 +3,7 @@ import { Mail, Linkedin, Github, MessageCircle, Send, CheckCircle } from 'lucide
 import { toast } from 'sonner';
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -27,7 +27,7 @@ export default function ContactSection() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Erro desconhecido');
       setSent(true);
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (err: any) {
       toast.error(err.message ?? 'Erro ao enviar. Tente novamente.');
     } finally {
@@ -101,6 +101,14 @@ export default function ContactSection() {
                 <label htmlFor="email" className="block text-sm font-semibold mb-2">Seu Email</label>
                 <input type="email" id="email" name="email" value={formData.email} onChange={handleChange}
                   placeholder="joao@empresa.com.br" required
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors" />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-semibold mb-2">
+                  WhatsApp <span className="text-gray-500 font-normal">(opcional)</span>
+                </label>
+                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange}
+                  placeholder="+55 (31) 99999-9999"
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors" />
               </div>
               <div>
