@@ -113,3 +113,4 @@ temp/
 
 # Manus logs
 .manus-logs/
+.bash_extras
