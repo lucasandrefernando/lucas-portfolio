@@ -94,7 +94,7 @@ export default function TestimonialsSection() {
 
   const startMarquee = () =>
     controls.start({
-      x: ['0%', '-50%'],
+      x: ['-50%', '0%'],
       transition: { duration: 30, ease: 'linear', repeat: Infinity },
     });
 
