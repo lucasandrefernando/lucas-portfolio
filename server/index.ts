@@ -12,23 +12,20 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
 
-  // Tenta carregar certificados SSL do KingHost (~/apps_nodejs/certificado/)
-  // Se não existirem, sobe em HTTP normal (ambiente de desenvolvimento)
+  // Tenta carregar certificado SSL do KingHost (~/apps_nodejs/certificado/*.pem)
+  // O arquivo .pem do KingHost contém chave + certificado + CA em um único arquivo
+  // Se não existir, sobe em HTTP normal (ambiente de desenvolvimento)
   const certDir = path.resolve(__dirname, "..", "certificado");
-  const certFiles = {
-    key: path.join(certDir, "private.key"),
-    cert: path.join(certDir, "certificate.crt"),
-    ca: path.join(certDir, "ca.crt"),
-  };
-  const hasSSL = fs.existsSync(certFiles.key) && fs.existsSync(certFiles.cert);
+  const pemFile = fs.existsSync(certDir)
+    ? (fs.readdirSync(certDir).find((f) => f.startsWith("portfolio") && f.endsWith(".pem")) ??
+       fs.readdirSync(certDir).find((f) => f.endsWith(".pem")))
+    : undefined;
+  const pemPath = pemFile ? path.join(certDir, pemFile) : undefined;
+  const hasSSL = !!pemPath && fs.existsSync(pemPath);
 
   const server = hasSSL
     ? createHttpsServer(
-        {
-          key: fs.readFileSync(certFiles.key),
-          cert: fs.readFileSync(certFiles.cert),
-          ...(fs.existsSync(certFiles.ca) && { ca: fs.readFileSync(certFiles.ca) }),
-        },
+        { key: fs.readFileSync(pemPath!), cert: fs.readFileSync(pemPath!) },
         app
       )
     : createHttpServer(app);
