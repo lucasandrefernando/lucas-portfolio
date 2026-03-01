@@ -13,58 +13,58 @@ const experiences: Experience[] = [
   {
     company: 'Eagle Telecom',
     position: 'Desenvolvedor Full Stack',
-    period: 'Set 2025 - Presente',
+    period: 'Set 2025 — Presente',
     description:
-      'Responsável pelo desenvolvimento end-to-end de sistemas internos e soluções para clientes externos. Atuo desde a concepção da arquitetura até a interface final, garantindo qualidade e performance.',
+      'Desenvolvimento end-to-end de sistemas internos e soluções para clientes externos. Da arquitetura à interface — com responsabilidade técnica total sobre qualidade, performance e prazo.',
     highlights: [
-      'Desenvolvimento de landing pages complexas e responsivas',
-      'Criação de automações inteligentes que otimizam fluxos críticos',
-      'Implementação de ferramentas de IA no fluxo de desenvolvimento',
-      'Liderança técnica em projetos PHP',
+      'Sistemas web complexos e responsivos construídos do zero',
+      'Automações inteligentes que eliminaram gargalos operacionais críticos',
+      'IA integrada ao fluxo de desenvolvimento para acelerar entregas',
+      'Liderança técnica em projetos PHP de alta complexidade',
     ],
-    technologies: ['PHP', 'JavaScript', 'React', 'MySQL', 'IA'],
+    technologies: ['PHP', 'JavaScript', 'React', 'MySQL', 'Node.js', 'IA'],
   },
   {
     company: 'Eagle Telecom',
     position: 'Técnico de Suporte II',
-    period: 'Jan 2023 - Set 2025',
+    period: 'Jan 2023 — Set 2025',
     description:
-      'Responsável pelo suporte técnico avançado, resolução de problemas complexos e manutenção de sistemas críticos da empresa.',
+      'Suporte técnico avançado com foco em resolução de problemas complexos e estabilidade de sistemas críticos. Período de transição ativa para desenvolvimento, com contribuições técnicas crescentes.',
     highlights: [
-      'Resolução de problemas técnicos complexos',
-      'Manutenção e otimização de sistemas',
-      'Documentação de processos e soluções',
-      'Suporte ao desenvolvimento de novas features',
+      'Diagnóstico e resolução de falhas críticas em ambiente de produção',
+      'Otimização de sistemas legados com impacto direto na performance',
+      'Documentação técnica que reduziu tempo de onboarding da equipe',
+      'Suporte ao desenvolvimento de novas features e integrações',
     ],
-    technologies: ['Linux', 'Windows Server', 'Networking', 'Troubleshooting'],
+    technologies: ['Linux', 'Windows Server', 'Networking', 'SQL', 'Troubleshooting'],
   },
   {
     company: 'Telemont',
     position: 'Gestor de Informação',
-    period: 'Jun 2021 - Dez 2022',
+    period: 'Jun 2021 — Dez 2022',
     description:
-      'Gestão de dados, informações e processos operacionais. Responsável pela otimização de fluxos e análise de dados para tomada de decisão.',
+      'Gestão estratégica de dados e processos operacionais. Transformei dados brutos em dashboards acionáveis, apoiando decisões de negócio com análise estruturada.',
     highlights: [
-      'Análise e otimização de processos operacionais',
-      'Gestão de dados e informações críticas',
-      'Criação de dashboards e relatórios',
-      'Implementação de melhorias nos fluxos',
+      'Dashboards analíticos que passaram a guiar decisões executivas',
+      'Otimização de processos com redução mensurável de retrabalho',
+      'Gestão de dados críticos com foco em integridade e disponibilidade',
+      'Implementação de melhorias que aumentaram eficiência operacional',
     ],
-    technologies: ['Power BI', 'Excel', 'SQL', 'Data Analysis'],
+    technologies: ['Power BI', 'Excel Avançado', 'SQL', 'Data Analysis'],
   },
   {
     company: 'Decminas Distribuição e Logística',
     position: 'Analista de Infraestrutura de TI',
-    period: 'Mar 2020 - Mai 2021',
+    period: 'Mar 2020 — Mai 2021',
     description:
-      'Gestão de infraestrutura de TI, redes, servidores e segurança da informação. Planejamento e monitoramento de KPIs operacionais.',
+      'Gestão completa da infraestrutura de TI: redes, servidores, segurança e monitoramento. Base técnica que até hoje informa minha abordagem como desenvolvedor.',
     highlights: [
-      'Gerenciamento de redes e servidores',
-      'Implementação de políticas de segurança',
-      'Monitoramento de performance de sistemas',
-      'Planejamento de infraestrutura',
+      'Gerenciamento de redes e servidores em ambiente distribuído',
+      'Implementação de políticas de segurança e controle de acesso',
+      'Monitoramento proativo de performance com KPIs definidos',
+      'Planejamento e execução de melhorias de infraestrutura',
     ],
-    technologies: ['Linux', 'Windows Server', 'Networking', 'Security'],
+    technologies: ['Linux', 'Windows Server', 'Networking', 'Segurança da Informação'],
   },
 ];
 
@@ -77,10 +77,11 @@ export default function ExperienceSection() {
             Experiência Profissional
           </span>
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Trajetória de Crescimento e Aprendizado
+            Uma Década Construindo Expertise Real
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Mais de 10 anos de experiência em diferentes áreas da tecnologia, evoluindo de infraestrutura para desenvolvimento full stack.
+            Da infraestrutura ao desenvolvimento full stack — cada etapa adicionou uma camada de
+            profundidade técnica que poucos desenvolvedores têm.
           </p>
         </div>
 
@@ -112,7 +113,9 @@ export default function ExperienceSection() {
 
                   {/* Highlights */}
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-gray-600 uppercase">Destaques:</p>
+                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                      Principais Entregas
+                    </p>
                     <ul className="space-y-2">
                       {exp.highlights.map((highlight, i) => (
                         <li key={i} className="flex items-start gap-2 text-gray-700">
@@ -126,7 +129,9 @@ export default function ExperienceSection() {
 
                 {/* Right - Technologies */}
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 uppercase mb-4">Tecnologias</p>
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
+                    Tecnologias
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {exp.technologies.map((tech, i) => (
                       <span
@@ -150,16 +155,16 @@ export default function ExperienceSection() {
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-200">
               <h4 className="text-xl font-bold text-gray-900 mb-2">Sistemas de Informação</h4>
               <p className="text-gray-600 font-semibold mb-2">Anhanguera Educacional</p>
-              <p className="text-gray-600">Fev 2012 - Ago 2016</p>
+              <p className="text-gray-600">Fev 2012 — Ago 2016</p>
             </div>
 
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 border border-purple-200">
               <h4 className="text-xl font-bold text-gray-900 mb-2">Certificações</h4>
               <ul className="space-y-2 text-gray-600">
-                <li>• Masterizando o ChatGPT (Adapta)</li>
-                <li>• Sistemas Computacionais e Segurança (Una)</li>
-                <li>• Modelagem de Software (Una)</li>
-                <li>• Programação de Soluções Computacionais (Una)</li>
+                <li>• Masterizando o ChatGPT — Adapta</li>
+                <li>• Sistemas Computacionais e Segurança — Una</li>
+                <li>• Modelagem de Software — Una</li>
+                <li>• Programação de Soluções Computacionais — Una</li>
               </ul>
             </div>
           </div>

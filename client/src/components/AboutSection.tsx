@@ -2,12 +2,12 @@ import { CheckCircle2 } from 'lucide-react';
 
 export default function AboutSection() {
   const highlights = [
-    'Desenvolvimento Full Stack com visão sistêmica',
-    'Especialista em arquitetura de banco de dados',
-    'Integração estratégica de IA em processos',
-    'Automação inteligente e otimização de fluxos',
-    'Entrega de ponta a ponta (SDLC completo)',
-    'Foco em escalabilidade e performance',
+    'Arquitetura de sistemas do banco de dados à interface',
+    'Performance e escalabilidade como requisitos, não afterthoughts',
+    'Integração estratégica de IA em fluxos reais de trabalho',
+    'Automação que elimina retrabalho e reduz custo operacional',
+    'Entrega completa — da concepção ao deploy em produção',
+    'Comunicação clara com times técnicos e não técnicos',
   ];
 
   return (
@@ -21,16 +21,24 @@ export default function AboutSection() {
                 Sobre Mim
               </span>
               <h2 className="text-4xl font-bold text-gray-900">
-                Mais que um desenvolvedor, um <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">solucionador de problemas</span>
+                Mais que um desenvolvedor, um{' '}
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  arquiteto de soluções
+                </span>
               </h2>
             </div>
 
             <p className="text-lg text-gray-600 leading-relaxed">
-              Com mais de 10 anos de trajetória na área de Tecnologia, comecei minha carreira em infraestrutura de TI e evolui para desenvolvimento de software de alto impacto. Essa jornada me deu uma visão sistêmica única: entendo não apenas como código funciona, mas como sistemas inteiros se conectam.
+              Comecei em infraestrutura de TI — redes, servidores, segurança. Essa base me deu algo
+              raro no desenvolvimento: visão sistêmica completa. Hoje escrevo código sabendo exatamente
+              onde ele vai rodar, como vai falhar e como evitar isso desde o início.
             </p>
 
             <p className="text-lg text-gray-600 leading-relaxed">
-              Atualmente, na <strong>Eagle Telecom</strong>, desenvolvo soluções complexas do zero até a produção. Meu diferencial é a integração estratégica de <strong>Inteligência Artificial</strong> nos processos de desenvolvimento, otimizando tempo de entrega e elevando a qualidade técnica.
+              Na <strong>Eagle Telecom</strong>, desenvolvo sistemas críticos do zero à produção.
+              Meu diferencial real: uso <strong>Inteligência Artificial</strong> como ferramenta de
+              trabalho — não como buzz word — para entregar mais rápido, com mais qualidade e menos
+              retrabalho.
             </p>
 
             {/* Highlights */}
@@ -59,7 +67,9 @@ export default function AboutSection() {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900 mb-2">Infraestrutura & Suporte</h3>
-                    <p className="text-gray-600 text-sm">Início da carreira com foco em redes, servidores e segurança da informação</p>
+                    <p className="text-gray-600 text-sm">
+                      A fundação: redes, servidores e segurança que me deram visão sistêmica única
+                    </p>
                   </div>
                 </div>
 
@@ -70,7 +80,9 @@ export default function AboutSection() {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900 mb-2">Análise de Dados & Gestão</h3>
-                    <p className="text-gray-600 text-sm">Transição para análise de dados, Power BI e otimização de processos</p>
+                    <p className="text-gray-600 text-sm">
+                      Power BI, SQL e processos: aprendi a transformar dados em decisões
+                    </p>
                   </div>
                 </div>
 
@@ -81,7 +93,9 @@ export default function AboutSection() {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900 mb-2">Desenvolvimento Full Stack</h3>
-                    <p className="text-gray-600 text-sm">Especialização em PHP, JavaScript/React e arquitetura de sistemas</p>
+                    <p className="text-gray-600 text-sm">
+                      PHP, JavaScript, React e arquitetura de sistemas escaláveis em produção
+                    </p>
                   </div>
                 </div>
 
@@ -92,7 +106,9 @@ export default function AboutSection() {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900 mb-2">IA & Automação Inteligente</h3>
-                    <p className="text-gray-600 text-sm">Integração de IA em desenvolvimento para soluções mais eficientes</p>
+                    <p className="text-gray-600 text-sm">
+                      Integrando IA como vantagem competitiva real — menos retrabalho, mais entrega
+                    </p>
                   </div>
                 </div>
               </div>

@@ -13,14 +13,23 @@ export default function HeroSection() {
             <div className="space-y-4">
               <div className="inline-block">
                 <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                  👋 Bem-vindo ao meu portfólio
+                  Desenvolvedor Full Stack · Disponível para Projetos
                 </span>
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Transformando <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ideias em Sistemas</span> Inteligentes
+                Código que{' '}
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  escala
+                </span>
+                . Soluções que{' '}
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  transformam
+                </span>
+                .
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Desenvolvedor Full Stack com mais de 10 anos de experiência em tecnologia. Especializado em PHP (Sênior), JavaScript/React (Pleno) e automação inteligente. Transformo desafios complexos em soluções escaláveis e inovadoras.
+                10+ anos construindo sistemas robustos do zero ao deploy. Sênior em PHP, pleno em
+                React — e integro IA onde outros ainda usam planilhas.
               </p>
             </div>
 
@@ -33,7 +42,7 @@ export default function HeroSection() {
                 }}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold flex items-center justify-center gap-2"
               >
-                Vamos Conversar <ArrowRight size={20} />
+                Iniciar Conversa <ArrowRight size={20} />
               </button>
               <button
                 onClick={() => {
@@ -57,7 +66,7 @@ export default function HeroSection() {
                 <Linkedin size={24} className="text-gray-700 hover:text-blue-600" />
               </a>
               <a
-                href="https://github.com"
+                href="https://github.com/lucasandrefernando"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-all"
@@ -65,7 +74,7 @@ export default function HeroSection() {
                 <Github size={24} className="text-gray-700" />
               </a>
               <a
-                href="mailto:lucas@example.com"
+                href="mailto:lucas@anacron.com.br"
                 className="p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-red-600 hover:bg-red-50 transition-all"
               >
                 <Mail size={24} className="text-gray-700 hover:text-red-600" />
@@ -78,7 +87,7 @@ export default function HeroSection() {
             <div className="relative w-full h-96">
               {/* Animated Gradient Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-2xl opacity-20 blur-3xl animate-pulse" />
-              
+
               {/* Code Card */}
               <div className="relative bg-gray-900 rounded-2xl p-8 shadow-2xl border border-gray-800">
                 <div className="space-y-4 font-mono text-sm">
@@ -89,27 +98,32 @@ export default function HeroSection() {
                   </div>
                   <div className="text-blue-400">
                     <span className="text-gray-500">{'>'} </span>
-                    <span>developer.skills = </span>
+                    <span>developer.expertise = </span>
                     <span className="text-yellow-400">[</span>
                   </div>
                   <div className="text-purple-400 ml-4">
-                    <span className="text-yellow-400">'PHP'</span>
-                    <span>, </span>
-                    <span className="text-yellow-400">'JavaScript'</span>
+                    <span className="text-yellow-400">'PHP Senior'</span>
                     <span>, </span>
                     <span className="text-yellow-400">'React'</span>
+                    <span>, </span>
+                    <span className="text-yellow-400">'Node.js'</span>
                   </div>
                   <div className="text-purple-400 ml-4">
                     <span className="text-yellow-400">'MySQL'</span>
                     <span>, </span>
-                    <span className="text-yellow-400">'AI/Automation'</span>
+                    <span className="text-yellow-400">'IA & Automação'</span>
                   </div>
                   <div className="text-blue-400">
                     <span className="text-yellow-400">]</span>
                   </div>
                   <div className="text-green-400 pt-4">
                     <span className="text-gray-500">{'>'} </span>
-                    <span>developer.buildAwesome()</span>
+                    <span>developer.solve(</span>
+                    <span className="text-yellow-400">yourProblem</span>
+                    <span>)</span>
+                  </div>
+                  <div className="text-gray-500 text-xs pt-2">
+                    ✓ Retorna solução escalável em produção
                   </div>
                 </div>
               </div>
@@ -128,8 +142,8 @@ export default function HeroSection() {
             <p className="text-gray-600 font-medium">Projetos Entregues</p>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-pink-600 mb-2">100%</div>
-            <p className="text-gray-600 font-medium">Comprometido com Qualidade</p>
+            <div className="text-4xl font-bold text-pink-600 mb-2">Full</div>
+            <p className="text-gray-600 font-medium">Stack — Do Back ao Front</p>
           </div>
         </div>
       </div>

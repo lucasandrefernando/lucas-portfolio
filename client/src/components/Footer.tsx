@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <h3 className="text-2xl font-bold text-white mb-2">Lucas André</h3>
-            <p className="text-gray-400">Desenvolvedor Full Stack com paixão por criar soluções inovadoras.</p>
+            <p className="text-gray-400">Full Stack Developer. Código que escala, soluções que transformam.</p>
           </div>
 
           {/* Quick Links */}
@@ -68,7 +68,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/lucasandrefernando"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors"
@@ -78,7 +78,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:lucas@example.com"
+                  href="mailto:lucas@anacron.com.br"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Email

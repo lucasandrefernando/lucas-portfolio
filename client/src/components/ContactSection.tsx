@@ -44,13 +44,13 @@ export default function ContactSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold mb-4">
-            Vamos Trabalhar Juntos
+            Vamos Trabalhar Juntos?
           </span>
           <h2 className="text-4xl font-bold mb-4">
-            Pronto para o Próximo Desafio?
+            Tem um Problema para Resolver?
           </h2>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Tenho interesse em desafios que exigem visão sistêmica, escalabilidade e inovação constante. Entre em contato!
+            Seja um sistema do zero, uma automação que vai economizar horas do seu time ou uma integração com IA — estou disponível para discutir como posso ajudar.
           </p>
         </div>
 
@@ -192,14 +192,14 @@ export default function ContactSection() {
               {/* Message Input */}
               <div>
                 <label htmlFor="message" className="block text-sm font-semibold mb-2">
-                  Sua Mensagem
+                  Descreva seu Projeto
                 </label>
                 <textarea
                   id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Conte-me sobre seu projeto..."
+                  placeholder="Qual problema você precisa resolver? Quanto mais detalhes, melhor..."
                   rows={5}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors resize-none"
                 />

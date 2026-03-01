@@ -13,68 +13,68 @@ interface Project {
 const projects: Project[] = [
   {
     title: 'Sistema de Gerenciamento de Estoque',
-    description: 'Plataforma completa para controle de estoque com relatórios em tempo real',
+    description: 'Controle total do estoque com alertas, relatórios e múltiplos usuários',
     longDescription:
-      'Sistema desenvolvido em PHP e MySQL para gerenciamento de estoque de pequenos negócios. Inclui controle de entrada e saída de produtos, geração de relatórios, alertas de estoque baixo e integração com múltiplos usuários.',
+      'Plataforma PHP/MySQL para gestão completa de estoque. Controle de entradas e saídas, alertas automáticos de estoque crítico, relatórios gerenciais e suporte a múltiplos operadores com permissões distintas.',
     technologies: ['PHP', 'MySQL', 'HTML', 'CSS', 'JavaScript'],
     highlights: [
-      'Interface intuitiva e responsiva',
-      'Relatórios em tempo real',
+      'Alertas automáticos de estoque mínimo',
+      'Relatórios exportáveis em tempo real',
     ],
   },
   {
     title: 'Landing Page de E-commerce',
-    description: 'Landing page moderna e otimizada para conversão com design responsivo',
+    description: 'Página de alta conversão com design moderno e animações fluidas',
     longDescription:
-      'Desenvolvida em React com Tailwind CSS, apresenta design moderno, animações suaves e otimização para SEO. Inclui integração com carrinho de compras e sistema de pagamento.',
+      'Desenvolvida em React com Tailwind CSS e Framer Motion. Design responsivo, animações estratégicas para guiar o usuário e estrutura otimizada para conversão — do primeiro scroll ao CTA.',
     technologies: ['React', 'Tailwind CSS', 'JavaScript', 'Framer Motion'],
     highlights: [
-      'Design responsivo e moderno',
-      'Otimizado para conversão',
+      'Estrutura de UX focada em conversão',
+      'Animações que aumentam engajamento',
     ],
   },
   {
     title: 'Automação de Processos com IA',
-    description: 'Sistema inteligente que automatiza processos operacionais usando IA',
+    description: 'Elimina 70% do trabalho manual com inteligência artificial aplicada',
     longDescription:
-      'Solução que integra ChatGPT e outras ferramentas de IA para automatizar processos repetitivos. Reduz tempo operacional em até 70% e melhora a precisão dos dados.',
+      'Integração de ChatGPT e ferramentas de IA para automatizar processos operacionais repetitivos. Resultado documentado: 70% de redução no tempo operacional e eliminação de erros manuais recorrentes.',
     technologies: ['Python', 'ChatGPT API', 'Node.js', 'MySQL'],
     highlights: [
-      'Redução de 70% no tempo operacional',
-      'Integração com IA avançada',
+      '70% de redução no tempo operacional',
+      'Zero retrabalho por erros manuais',
     ],
   },
   {
     title: 'Dashboard de Análise de Dados',
-    description: 'Dashboard interativo com visualizações de dados em tempo real',
+    description: 'Visualizações interativas que transformam dados em decisões',
     longDescription:
-      'Desenvolvido em React com Recharts, apresenta gráficos interativos, filtros avançados e exportação de dados. Conectado a API backend para dados em tempo real.',
+      'Dashboard em React com Recharts conectado a API backend em tempo real. Filtros avançados, gráficos interativos e exportação de dados — para gestores que precisam de clareza, não de planilhas.',
     technologies: ['React', 'Recharts', 'Node.js', 'MySQL'],
     highlights: [
-      'Gráficos interativos',
-      'Dados em tempo real',
+      'Dados em tempo real sem refresh',
+      'Filtros e exportação avançados',
     ],
   },
   {
     title: 'API RESTful Escalável',
-    description: 'API robusta e escalável para aplicações mobile e web',
+    description: 'Backend robusto com autenticação segura e documentação completa',
     longDescription:
-      'Desenvolvida em Node.js com Express, oferece autenticação JWT, validação de dados, tratamento de erros e documentação completa com Swagger.',
-    technologies: ['Node.js', 'Express', 'MySQL', 'JWT'],
+      'API Node.js/Express com autenticação JWT, validação de dados em múltiplas camadas, tratamento de erros padronizado e documentação Swagger. Construída para crescer sem refatoração.',
+    technologies: ['Node.js', 'Express', 'MySQL', 'JWT', 'Swagger'],
     highlights: [
-      'Autenticação segura com JWT',
-      'Validação de dados robusta',
+      'Autenticação JWT com refresh token',
+      'Documentação completa no Swagger',
     ],
   },
   {
     title: 'Aplicação Web Progressiva (PWA)',
-    description: 'PWA com funcionalidades offline e instalação em home screen',
+    description: 'Funciona offline, instala no celular e sincroniza quando conectar',
     longDescription:
-      'Aplicação web que funciona offline, pode ser instalada no home screen e sincroniza dados quando conectada. Desenvolvida em React com Service Workers.',
+      'PWA desenvolvida em React com Service Workers e IndexedDB. O usuário usa normalmente sem internet — os dados sincronizam automaticamente quando a conexão é restaurada. Experiência nativa sem app store.',
     technologies: ['React', 'Service Workers', 'IndexedDB', 'Tailwind CSS'],
     highlights: [
-      'Funciona offline',
-      'Instalável no home screen',
+      'Operação completa sem internet',
+      'Instalável como app nativo',
     ],
   },
 ];
@@ -87,11 +87,10 @@ export default function ProjectsSection() {
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Portfólio
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Projetos em Destaque
-          </h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Projetos que Resolvem Problemas</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Alguns dos projetos mais relevantes que desenvolvi, demonstrando expertise técnica e capacidade de entrega.
+            Cada projeto aqui existe porque havia um problema real para resolver. Tecnologia é o meio
+            — resultado é o que importa.
           </p>
         </div>
 
@@ -107,10 +106,14 @@ export default function ProjectsSection() {
               </div>
 
               <div className="p-6 flex-1 flex flex-col">
-                <p className="text-gray-700 text-sm leading-relaxed mb-4">{project.longDescription}</p>
+                <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                  {project.longDescription}
+                </p>
 
                 <div className="mb-6">
-                  <p className="text-xs font-semibold text-gray-600 uppercase mb-2">Destaques:</p>
+                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                    Resultados:
+                  </p>
                   <ul className="space-y-1">
                     {project.highlights.map((highlight, i) => (
                       <li key={i} className="flex items-start gap-2 text-gray-700 text-sm">
@@ -122,7 +125,9 @@ export default function ProjectsSection() {
                 </div>
 
                 <div className="mb-6">
-                  <p className="text-xs font-semibold text-gray-600 uppercase mb-2">Tecnologias:</p>
+                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                    Tecnologias:
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {project.technologies.map((tech, i) => (
                       <span
