@@ -52,6 +52,12 @@ export default function Header() {
             Projetos
           </button>
           <button
+            onClick={() => scrollToSection('depoimentos')}
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+          >
+            Depoimentos
+          </button>
+          <button
             onClick={() => scrollToSection('contato')}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-shadow font-medium"
           >
@@ -94,6 +100,12 @@ export default function Header() {
             className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
             Projetos
+          </button>
+          <button
+            onClick={() => scrollToSection('depoimentos')}
+            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            Depoimentos
           </button>
           <button
             onClick={() => scrollToSection('contato')}
