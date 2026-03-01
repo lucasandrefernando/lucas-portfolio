@@ -1,5 +1,6 @@
 import express from "express";
-import { createServer } from "http";
+import { createServer as createHttpServer } from "http";
+import { createServer as createHttpsServer } from "https";
 import { exec } from "child_process";
 import path from "path";
 import fs from "fs";
@@ -10,7 +11,27 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const server = createServer(app);
+
+  // Tenta carregar certificados SSL do KingHost (~/apps_nodejs/certificado/)
+  // Se não existirem, sobe em HTTP normal (ambiente de desenvolvimento)
+  const certDir = path.resolve(__dirname, "..", "certificado");
+  const certFiles = {
+    key: path.join(certDir, "private.key"),
+    cert: path.join(certDir, "certificate.crt"),
+    ca: path.join(certDir, "ca.crt"),
+  };
+  const hasSSL = fs.existsSync(certFiles.key) && fs.existsSync(certFiles.cert);
+
+  const server = hasSSL
+    ? createHttpsServer(
+        {
+          key: fs.readFileSync(certFiles.key),
+          cert: fs.readFileSync(certFiles.cert),
+          ...(fs.existsSync(certFiles.ca) && { ca: fs.readFileSync(certFiles.ca) }),
+        },
+        app
+      )
+    : createHttpServer(app);
 
   // Auto-detecta o caminho dos arquivos estaticos
   // Em producao (KingHost): public/ fica na mesma pasta que index.js
@@ -74,7 +95,7 @@ async function startServer() {
   const port = kingHostPort || process.env.PORT || 3000;
 
   server.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${port} (${hasSSL ? "HTTPS" : "HTTP"})`);
   });
 
   // Graceful shutdown: fecha o servidor antes de sair para liberar a porta
