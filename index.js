@@ -36635,7 +36635,7 @@ async function startServer() {
     message: { error: "Muitas tentativas. Aguarde 15 minutos e tente novamente." }
   });
   app.post("/api/contact", contactLimiter, async (req, res) => {
-    const { name, email, message } = req.body ?? {};
+    const { name, email, phone, message } = req.body ?? {};
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return res.status(400).json({ error: "Preencha todos os campos." });
     }
@@ -36676,6 +36676,7 @@ async function startServer() {
               <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
                 <tr><td style="padding:8px 0;color:#6b7280;font-size:13px;width:80px">Nome</td><td style="padding:8px 0;font-weight:600">${name}</td></tr>
                 <tr><td style="padding:8px 0;color:#6b7280;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${email}" style="color:#2563eb">${email}</a></td></tr>
+                ${phone?.trim() ? `<tr><td style="padding:8px 0;color:#6b7280;font-size:13px">WhatsApp</td><td style="padding:8px 0"><a href="https://wa.me/${phone.replace(/\D/g, "")}" style="color:#2563eb">${phone}</a></td></tr>` : ""}
               </table>
               <p style="color:#6b7280;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Mensagem</p>
               <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#fff;border-radius:4px;margin:0;color:#374151;line-height:1.6">
@@ -36689,7 +36690,9 @@ async function startServer() {
       await transporter.sendMail({
         from: `"Lucas Andr\xE9" <${smtpUser}>`,
         to: email,
-        subject: `Ol\xE1, ${name}! Recebi sua mensagem \u2014 Lucas Andr\xE9`,
+        replyTo: "lucas@anacron.com.br",
+        subject: `Recebi seu contato, ${name}`,
+        headers: { "X-Priority": "3", "Importance": "Normal" },
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
             <div style="background:linear-gradient(135deg,#1e40af,#7c3aed);padding:32px;border-radius:8px 8px 0 0;text-align:center">
