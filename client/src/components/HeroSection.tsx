@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import CountUp from './CountUp';
 
 export default function HeroSection() {
   return (
@@ -166,12 +167,12 @@ export default function HeroSection() {
               {/* Experience strip */}
               <div className="mt-10 bg-white rounded-2xl shadow-lg border border-gray-100 px-8 py-4 flex items-center gap-8">
                 <div className="text-center">
-                  <div className="text-2xl font-black text-gray-900">10<span className="text-blue-600">+</span></div>
+                  <div className="text-2xl font-black text-gray-900"><CountUp end={10} /><span className="text-blue-600">+</span></div>
                   <div className="text-xs text-gray-500 font-medium">Anos de exp.</div>
                 </div>
                 <div className="w-px h-8 bg-gray-200" />
                 <div className="text-center">
-                  <div className="text-2xl font-black text-gray-900">50<span className="text-purple-600">+</span></div>
+                  <div className="text-2xl font-black text-gray-900"><CountUp end={50} /><span className="text-purple-600">+</span></div>
                   <div className="text-xs text-gray-500 font-medium">Projetos</div>
                 </div>
                 <div className="w-px h-8 bg-gray-200" />
@@ -188,13 +189,13 @@ export default function HeroSection() {
         <div className="grid grid-cols-3 gap-6 mt-16 pt-12 border-t border-gray-200">
           <div className="text-center group cursor-default">
             <div className="text-4xl font-black text-gray-900 mb-1">
-              10<span className="text-blue-600">+</span>
+              <CountUp end={10} /><span className="text-blue-600">+</span>
             </div>
             <p className="text-gray-500 text-sm font-medium">Anos de Experiência</p>
           </div>
           <div className="text-center group cursor-default">
             <div className="text-4xl font-black text-gray-900 mb-1">
-              50<span className="text-purple-600">+</span>
+              <CountUp end={50} /><span className="text-purple-600">+</span>
             </div>
             <p className="text-gray-500 text-sm font-medium">Projetos Entregues</p>
           </div>
