@@ -6,6 +6,27 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
 import rateLimit from "express-rate-limit";
+import mysql from "mysql2/promise";
+
+// ── MySQL helpers ─────────────────────────────────────────────────────────────
+let dbPool: mysql.Pool | null = null;
+
+const getDB = (): mysql.Pool | null => {
+  if (!dbPool && process.env.DB_HOST && process.env.DB_USER && process.env.DB_PASS && process.env.DB_NAME) {
+    dbPool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 5,
+      charset: "utf8mb4",
+    });
+  }
+  return dbPool;
+};
+
+const split = (s: string): string[] => s.split(" | ").map((t) => t.trim()).filter(Boolean);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -255,6 +276,85 @@ Diretrizes:
     } catch (err) {
       console.error("[contact] Erro ao enviar email:", err);
       res.status(500).json({ error: "Erro ao enviar mensagem. Tente novamente." });
+    }
+  });
+
+  // ── Portfolio Data (MySQL) ────────────────────────────────────────────────
+  app.get("/api/portfolio/skills", async (_req, res) => {
+    const db = getDB();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+    try {
+      const [rows] = await db.query("SELECT name, level, proficiency, category FROM skills WHERE active=1 ORDER BY sort_order");
+      res.json(rows);
+    } catch (err) {
+      console.error("[db/skills]", err);
+      res.status(500).json({ error: "DB error" });
+    }
+  });
+
+  app.get("/api/portfolio/experiences", async (_req, res) => {
+    const db = getDB();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+    try {
+      const [rows] = await db.query("SELECT company, position, period, description, highlights, technologies FROM experiences WHERE active=1 ORDER BY sort_order") as any[];
+      const data = (rows as any[]).map((r) => ({
+        company: r.company,
+        position: r.position,
+        period: r.period,
+        description: r.description,
+        highlights: split(r.highlights),
+        technologies: split(r.technologies),
+      }));
+      res.json(data);
+    } catch (err) {
+      console.error("[db/experiences]", err);
+      res.status(500).json({ error: "DB error" });
+    }
+  });
+
+  app.get("/api/portfolio/education", async (_req, res) => {
+    const db = getDB();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+    try {
+      const [rows] = await db.query("SELECT type, title, institution, period FROM education WHERE active=1 ORDER BY sort_order");
+      res.json(rows);
+    } catch (err) {
+      console.error("[db/education]", err);
+      res.status(500).json({ error: "DB error" });
+    }
+  });
+
+  app.get("/api/portfolio/projects", async (_req, res) => {
+    const db = getDB();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+    try {
+      const [rows] = await db.query("SELECT icon, category, title, client, description, outcomes, technologies, status FROM projects WHERE active=1 ORDER BY sort_order") as any[];
+      const data = (rows as any[]).map((r) => ({
+        icon: r.icon,
+        category: r.category,
+        title: r.title,
+        client: r.client,
+        description: r.description,
+        outcomes: split(r.outcomes),
+        technologies: split(r.technologies),
+        status: r.status,
+      }));
+      res.json(data);
+    } catch (err) {
+      console.error("[db/projects]", err);
+      res.status(500).json({ error: "DB error" });
+    }
+  });
+
+  app.get("/api/portfolio/testimonials", async (_req, res) => {
+    const db = getDB();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+    try {
+      const [rows] = await db.query("SELECT name, role, company, text, color FROM testimonials WHERE active=1 ORDER BY sort_order");
+      res.json(rows);
+    } catch (err) {
+      console.error("[db/testimonials]", err);
+      res.status(500).json({ error: "DB error" });
     }
   });
 
