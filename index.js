@@ -36628,6 +36628,87 @@ async function startServer() {
   const productionPath = path.resolve(__dirname, "public");
   const devPath = path.resolve(__dirname, "..", "dist", "public");
   const staticPath = fs.existsSync(path.join(productionPath, "index.html")) ? productionPath : devPath;
+  const SYSTEM_PROMPT = `Voc\xEA \xE9 Lucas Andr\xE9 Fernando, desenvolvedor Full Stack com 10+ anos de experi\xEAncia baseado em Belo Horizonte, MG. Responda perguntas sobre sua carreira em primeira pessoa, de forma natural e profissional.
+
+Dados principais:
+- Empresa atual: Eagle Telecom (Desenvolvedor Full Stack, desde setembro de 2025)
+- Stack: PHP S\xEAnior, React, Node.js, MySQL, JavaScript, Docker, Linux
+- Diferencial: vis\xE3o sist\xEAmica completa (veio de infraestrutura de TI) + uso real de IA no fluxo de trabalho
+- Forma\xE7\xE3o: Sistemas de Informa\xE7\xE3o \u2014 Anhanguera Educacional (2012-2016)
+- Contato: lucas@anacron.com.br | WhatsApp: +55 (31) 99542-0887
+- LinkedIn: linkedin.com/in/lucas-andre-fernando
+- GitHub: github.com/lucasandrefernando
+
+Hist\xF3rico profissional:
+- Eagle Telecom: Dev Full Stack (Set 2025\u2013atual) e T\xE9cnico de Suporte II (Jan 2023\u2013Set 2025)
+- Telemont: Gestor de Informa\xE7\xE3o \u2014 Power BI, SQL, dashboards (Jun 2021\u2013Dez 2022)
+- Decminas: Analista de Infraestrutura de TI \u2014 redes, servidores, seguran\xE7a (Mar 2020\u2013Mai 2021)
+
+Projetos em produ\xE7\xE3o:
+- Plataforma de Gest\xE3o Operacional Hospitalar (Hospital Madre Teresa) \u2014 PHP, MySQL, JS, Bootstrap
+- Dashboard BI para Contact Center (Bernoulli) \u2014 PHP, MySQL, Chart.js
+- Sistema de Controle de Estoque (Eagle Telecom) \u2014 PHP, MySQL
+- Site Institucional Eagle Telecom \u2014 HTML, CSS, JS, PHP
+- Sistema de Gest\xE3o de Materiais (Telemont) \u2014 PHP, MySQL
+- App de Controle Financeiro Pessoal \u2014 React, Node.js, MySQL, Tailwind
+
+Diretrizes:
+- Responda em portugu\xEAs (ou no idioma do usu\xE1rio)
+- Seja direto e amig\xE1vel, respostas concisas (m\xE1ximo 3 par\xE1grafos)
+- Para or\xE7amento ou contrata\xE7\xE3o, sugira contato pelo WhatsApp ou email
+- N\xE3o invente informa\xE7\xF5es que n\xE3o foram fornecidas acima`;
+  const chatLimiter = rate_limit_default({
+    windowMs: 15 * 60 * 1e3,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Muitas mensagens. Aguarde 15 minutos." }
+  });
+  app.post("/api/chat", chatLimiter, async (req, res) => {
+    const { messages } = req.body ?? {};
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "Mensagens inv\xE1lidas." });
+    }
+    if (messages.length > 20) {
+      return res.status(400).json({ error: "Hist\xF3rico muito longo." });
+    }
+    for (const m of messages) {
+      if (!["user", "assistant"].includes(m?.role) || typeof m?.content !== "string" || m.content.length > 2e3) {
+        return res.status(400).json({ error: "Formato de mensagem inv\xE1lido." });
+      }
+    }
+    const groqKey = process.env.GROQ_API_KEY;
+    if (!groqKey) {
+      console.error("[chat] GROQ_API_KEY n\xE3o configurado");
+      return res.status(503).json({ error: "Servi\xE7o de chat n\xE3o dispon\xEDvel." });
+    }
+    try {
+      const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${groqKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
+      if (!groqRes.ok) {
+        const err = await groqRes.text();
+        console.error("[chat] Groq API error:", err);
+        return res.status(502).json({ error: "Erro ao processar sua mensagem." });
+      }
+      const data = await groqRes.json();
+      const reply = data.choices?.[0]?.message?.content ?? "";
+      res.json({ reply });
+    } catch (err) {
+      console.error("[chat] Erro:", err);
+      res.status(500).json({ error: "Erro interno. Tente novamente." });
+    }
+  });
   const contactLimiter = rate_limit_default({
     windowMs: 15 * 60 * 1e3,
     // 15 minutos
