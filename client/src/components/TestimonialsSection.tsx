@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Quote } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 interface Testimonial {
@@ -13,9 +13,16 @@ interface Testimonial {
 
 const COLOR_GRADIENT: Record<string, string> = {
   blue:   'from-blue-500 to-blue-700',
-  purple: 'from-purple-500 to-purple-700',
-  pink:   'from-pink-500 to-pink-700',
-  green:  'from-green-500 to-green-700',
+  purple: 'from-purple-500 to-violet-700',
+  pink:   'from-pink-500 to-rose-700',
+  green:  'from-emerald-500 to-green-700',
+};
+
+const COLOR_INITIALS_TEXT: Record<string, string> = {
+  blue:   'text-blue-600',
+  purple: 'text-purple-600',
+  pink:   'text-pink-600',
+  green:  'text-emerald-600',
 };
 
 const FALLBACK: Testimonial[] = [
@@ -37,47 +44,23 @@ const FALLBACK: Testimonial[] = [
   },
 ];
 
-const variants = {
-  enter: (d: number) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit:  (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
-};
-
 export default function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(FALLBACK);
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     fetch('/api/portfolio/testimonials')
       .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setTestimonials(data);
-          setCurrent(0);
-        }
-      })
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setTestimonials(data); })
       .catch(() => {});
   }, []);
 
-  const go = (index: number) => {
-    setDirection(index > current ? 1 : -1);
-    setCurrent(index);
-  };
-  const prev = () => go((current - 1 + testimonials.length) % testimonials.length);
-  const next = () => go((current + 1) % testimonials.length);
-
-  const t = testimonials[current];
-  const gradient = COLOR_GRADIENT[t.color] ?? COLOR_GRADIENT.blue;
-  const initials = t.name.split(' ').slice(0, 2).map((n) => n[0]).join('');
-
   return (
     <section id="depoimentos" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
 
         {/* Header */}
         <ScrollReveal>
-          <div className="text-center space-y-4 mb-14">
+          <div className="text-center space-y-4 mb-16">
             <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
               Depoimentos
             </span>
@@ -90,60 +73,51 @@ export default function TestimonialsSection() {
           </div>
         </ScrollReveal>
 
-        {/* Carousel */}
-        <ScrollReveal delay={0.15}>
-          <div className="relative">
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 px-8 sm:px-12 py-12 overflow-hidden relative min-h-[280px]">
-              <Quote className="absolute top-8 right-8 w-14 h-14 text-gray-100 pointer-events-none" />
+        {/* Cards grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-14">
+          {testimonials.map((t, index) => {
+            const gradient    = COLOR_GRADIENT[t.color]      ?? COLOR_GRADIENT.blue;
+            const initialsClr = COLOR_INITIALS_TEXT[t.color] ?? COLOR_INITIALS_TEXT.blue;
+            const initials    = t.name.split(' ').slice(0, 2).map((n) => n[0]).join('');
 
-              <AnimatePresence mode="wait" custom={direction}>
+            return (
+              <ScrollReveal key={t.name} delay={index * 0.1}>
                 <motion.div
-                  key={current}
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="flex flex-col gap-8"
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  transition={{ type: 'spring', stiffness: 280, damping: 20 }}
+                  className="relative pt-8"
                 >
-                  <p className="text-lg text-gray-700 leading-relaxed relative z-10">
-                    "{t.text}"
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
-                      {initials}
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900">{t.name}</p>
-                      <p className="text-sm text-gray-500">{t.role} · {t.company}</p>
+                  {/* Avatar overlapping top */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-0 z-10">
+                    <div className="w-16 h-16 rounded-full bg-white shadow-xl p-1.5 ring-2 ring-white">
+                      <div className={`w-full h-full rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+                        <span className="text-white font-bold text-lg tracking-wide">{initials}</span>
+                      </div>
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-center gap-4 mt-8">
-              <button onClick={prev} className="p-2.5 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm" aria-label="Depoimento anterior">
-                <ChevronLeft size={20} className="text-gray-600" />
-              </button>
-              <div className="flex gap-2 items-center">
-                {testimonials.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => go(i)}
-                    aria-label={`Depoimento ${i + 1}`}
-                    className={`transition-all duration-300 rounded-full ${i === current ? 'w-6 h-2.5 bg-blue-600' : 'w-2.5 h-2.5 bg-gray-300 hover:bg-gray-400'}`}
-                  />
-                ))}
-              </div>
-              <button onClick={next} className="p-2.5 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm" aria-label="Próximo depoimento">
-                <ChevronRight size={20} className="text-gray-600" />
-              </button>
-            </div>
-          </div>
-        </ScrollReveal>
+                  {/* Card */}
+                  <div className={`bg-gradient-to-br ${gradient} rounded-2xl pt-12 pb-7 px-6 text-center shadow-lg relative overflow-hidden`}>
+                    {/* Decorative quote */}
+                    <Quote className="absolute top-4 right-5 w-10 h-10 text-white/15 pointer-events-none" />
+                    {/* Decorative circle */}
+                    <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-black/10 pointer-events-none" />
+
+                    <p className="font-bold text-white uppercase tracking-widest text-sm mb-0.5">
+                      {t.name}
+                    </p>
+                    <p className="text-white/60 text-xs mb-5">
+                      {t.role} · {t.company}
+                    </p>
+                    <p className="text-white/90 text-sm leading-relaxed">
+                      "{t.text}"
+                    </p>
+                  </div>
+                </motion.div>
+              </ScrollReveal>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
