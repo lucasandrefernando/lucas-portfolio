@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { Building2, BarChart3, Package, Globe, Wallet, Wrench, Briefcase, ChevronLeft, ChevronRight } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Building2, BarChart3, Package, Globe, Wallet, Wrench, Briefcase } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 interface Project {
@@ -128,79 +128,15 @@ const CAT_ACCENT: Record<string, string> = {
   'Projeto Pessoal':      'text-pink-600 bg-pink-50 border border-pink-100',
 };
 
-const CAT_DOT: Record<string, string> = {
-  'Saúde':                'bg-blue-500',
-  'Business Intelligence':'bg-purple-500',
-  'Logística':            'bg-orange-500',
-  'Web Institucional':    'bg-cyan-500',
-  'Operações':            'bg-green-500',
-  'Projeto Pessoal':      'bg-pink-500',
-};
-
-// Card slide + scale
-const cardVariants = {
-  enter: (d: number) => ({ x: d > 0 ? 120 : -120, opacity: 0, scale: 0.96 }),
-  center: { x: 0, opacity: 1, scale: 1 },
-  exit:  (d: number) => ({ x: d > 0 ? -120 : 120, opacity: 0, scale: 0.96 }),
-};
-
-// Stagger container
-const containerVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
-};
-
-// Each staggered child
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
-};
-
-// Icon spring
-const iconVariants = {
-  hidden: { opacity: 0, scale: 0.5, rotate: -10 },
-  show:   { opacity: 1, scale: 1, rotate: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } },
-};
-
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>(FALLBACK);
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetch('/api/portfolio/projects')
       .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data) && data.length > 0) { setProjects(data); setCurrent(0); } })
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setProjects(data); })
       .catch(() => {});
   }, []);
-
-  const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setDirection(1);
-      setCurrent((c) => (c + 1) % projects.length);
-    }, 5000);
-  };
-
-  const go = (index: number) => {
-    setDirection(index > current ? 1 : -1);
-    setCurrent(index);
-    startTimer(); // reset timer on manual nav
-  };
-  const prev = () => go((current - 1 + projects.length) % projects.length);
-  const next = () => go((current + 1) % projects.length);
-
-  // Auto-advance every 5s
-  useEffect(() => {
-    startTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [projects.length]);
-
-  const p = projects[current];
-  const gradient = CAT_GRADIENT[p.category] ?? CAT_GRADIENT['Saúde'];
-  const accent   = CAT_ACCENT[p.category]   ?? CAT_ACCENT['Saúde'];
-  const dotColor = CAT_DOT[p.category]      ?? CAT_DOT['Saúde'];
 
   return (
     <section id="projetos" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
@@ -217,157 +153,154 @@ export default function ProjectsSection() {
           </p>
         </ScrollReveal>
 
-        {/* Carousel */}
-        <ScrollReveal delay={0.1}>
-          <div className="relative overflow-hidden">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={current}
-                custom={direction}
-                variants={cardVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-5 rounded-2xl overflow-hidden shadow-2xl min-h-[400px]">
+        {/* Bento Grid
+            Desktop layout (lg):
+            ┌─────────────────────┬─────────────┐
+            │  Card 0 (2×2 large) │  Card 1     │
+            │                     ├─────────────┤
+            │                     │  Card 2     │
+            ├──────────┬──────────┼─────────────┤
+            │  Card 3  │  Card 4  │  Card 5     │
+            └──────────┴──────────┴─────────────┘
+        */}
+        <ScrollReveal delay={0.05}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-[260px_260px_260px] gap-4">
+            {projects.slice(0, 6).map((p, i) => {
+              const gradient = CAT_GRADIENT[p.category] ?? CAT_GRADIENT['Saúde'];
+              const accent   = CAT_ACCENT[p.category]   ?? CAT_ACCENT['Saúde'];
+              const icon     = ICON_MAP[p.icon]          ?? <Briefcase className="w-6 h-6" />;
+              const delay    = i * 0.07;
 
-                  {/* Left panel */}
-                  <div className={`lg:col-span-2 bg-gradient-to-br ${gradient} p-8 flex flex-col justify-between relative overflow-hidden`}>
-                    {/* Decorative circles */}
-                    <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/10 pointer-events-none" />
-                    <div className="absolute -bottom-16 -left-8 w-56 h-56 rounded-full bg-black/10 pointer-events-none" />
+              /* ── LARGE card — project 0 ── */
+              if (i === 0) return (
+                <motion.div
+                  key={p.title}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.55, delay }}
+                  whileHover={{ y: -6, transition: { duration: 0.22 } }}
+                  className={`md:col-span-2 lg:col-span-2 lg:row-span-2 rounded-2xl overflow-hidden shadow-xl flex flex-col bg-gradient-to-br ${gradient} relative`}
+                >
+                  {/* Decorative orbs */}
+                  <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 pointer-events-none" />
+                  <div className="absolute -bottom-20 -left-10 w-72 h-72 rounded-full bg-black/10 pointer-events-none" />
 
-                    <motion.div
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="show"
-                      className="relative z-10"
-                    >
-                      {/* Icon + status */}
-                      <div className="flex items-center justify-between mb-6">
-                        <motion.div variants={iconVariants} className="p-3 bg-white/20 rounded-xl backdrop-blur-sm text-white shadow-lg">
-                          {ICON_MAP[p.icon] ?? <Briefcase className="w-6 h-6" />}
-                        </motion.div>
-                        <motion.span variants={itemVariants} className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/25 backdrop-blur-sm text-white">
-                          {p.status}
-                        </motion.span>
+                  <div className="relative z-10 flex flex-col flex-1 p-8">
+                    {/* Icon + status */}
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm text-white shadow-lg">
+                        {icon}
                       </div>
+                      <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/25 text-white">
+                        {p.status}
+                      </span>
+                    </div>
 
-                      <motion.p variants={itemVariants} className="text-white/60 text-xs font-bold uppercase tracking-widest mb-2">
-                        {p.category}
-                      </motion.p>
-                      <motion.h3 variants={itemVariants} className="text-white text-2xl font-bold leading-snug mb-3">
-                        {p.title}
-                      </motion.h3>
-                      <motion.p variants={itemVariants} className="text-white/65 text-sm">
-                        {p.client}
-                      </motion.p>
-                    </motion.div>
+                    <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-1">{p.category}</p>
+                    <h3 className="text-white text-2xl font-bold leading-snug mb-1">{p.title}</h3>
+                    <p className="text-white/60 text-sm mb-4">{p.client}</p>
+                    <p className="text-white/80 text-sm leading-relaxed mb-5">{p.description}</p>
 
-                    {/* Counter */}
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.45 }}
-                      className="text-white/40 text-sm font-medium relative z-10 mt-6"
-                    >
-                      {current + 1} <span className="text-white/25">/</span> {projects.length}
-                    </motion.p>
+                    <ul className="space-y-1.5 mb-auto">
+                      {p.outcomes.map((o, j) => (
+                        <li key={j} className="flex items-start gap-2 text-sm text-white/85">
+                          <span className="text-white font-bold mt-0.5 shrink-0">✓</span>
+                          <span>{o}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="flex flex-wrap gap-2 mt-5">
+                      {p.technologies.map((tech) => (
+                        <motion.span
+                          key={tech}
+                          whileHover={{ scale: 1.08, y: -2 }}
+                          className="px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-md backdrop-blur-sm cursor-default"
+                        >
+                          {tech}
+                        </motion.span>
+                      ))}
+                    </div>
                   </div>
+                </motion.div>
+              );
 
-                  {/* Right panel */}
-                  <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="show"
-                    className="lg:col-span-3 bg-white p-8 flex flex-col justify-between"
-                  >
-                    <div>
-                      <motion.p variants={itemVariants} className="text-gray-600 leading-relaxed mb-6">
-                        {p.description}
-                      </motion.p>
-
-                      <motion.p variants={itemVariants} className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-                        Principais entregas
-                      </motion.p>
-
-                      <ul className="space-y-2 mb-6">
-                        {p.outcomes.map((o, i) => (
-                          <motion.li
-                            key={i}
-                            variants={itemVariants}
-                            className="flex items-start gap-2.5 text-sm text-gray-700"
-                          >
-                            <span className="mt-0.5 shrink-0 text-blue-500 font-bold">✓</span>
-                            <span>{o}</span>
-                          </motion.li>
-                        ))}
-                      </ul>
+              /* ── MEDIUM cards — projects 1 & 2 (right column, stacked) ── */
+              if (i === 1 || i === 2) return (
+                <motion.div
+                  key={p.title}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.55, delay }}
+                  whileHover={{ y: -4, transition: { duration: 0.22 } }}
+                  className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col min-h-[200px]"
+                >
+                  <div className={`h-1 shrink-0 bg-gradient-to-r ${gradient}`} />
+                  <div className="flex-1 p-5 flex flex-col min-h-0">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`p-2 rounded-lg ${accent}`}>{icon}</div>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLE[p.status]}`}>
+                        {p.status}
+                      </span>
                     </div>
 
-                    <div>
-                      <motion.p variants={itemVariants} className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-                        Tecnologias
-                      </motion.p>
-                      <motion.div variants={containerVariants} className="flex flex-wrap gap-2">
-                        {p.technologies.map((tech) => (
-                          <motion.span
-                            key={tech}
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.08, y: -2 }}
-                            className={`px-3 py-1 rounded-md text-xs font-semibold cursor-default ${accent}`}
-                          >
-                            {tech}
-                          </motion.span>
-                        ))}
-                      </motion.div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{p.category}</p>
+                    <h3 className="font-bold text-gray-900 text-sm leading-snug mb-0.5">{p.title}</h3>
+                    <p className="text-xs text-gray-500 mb-3">{p.client}</p>
+
+                    <ul className="space-y-1 mb-auto">
+                      {p.outcomes.slice(0, 2).map((o, j) => (
+                        <li key={j} className="flex items-start gap-1.5 text-xs text-gray-600">
+                          <span className="text-blue-500 font-bold shrink-0">✓</span>
+                          <span className="line-clamp-2">{o}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {p.technologies.slice(0, 4).map((tech) => (
+                        <span key={tech} className={`px-2 py-0.5 rounded text-xs font-medium ${accent}`}>{tech}</span>
+                      ))}
                     </div>
-                  </motion.div>
+                  </div>
+                </motion.div>
+              );
 
-                </div>
-              </motion.div>
-            </AnimatePresence>
+              /* ── SMALL cards — projects 3, 4, 5 (bottom row) ── */
+              return (
+                <motion.div
+                  key={p.title}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.55, delay }}
+                  whileHover={{ y: -4, transition: { duration: 0.22 } }}
+                  className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col min-h-[180px]"
+                >
+                  <div className={`h-1 shrink-0 bg-gradient-to-r ${gradient}`} />
+                  <div className="flex-1 p-5 flex flex-col min-h-0">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`p-2 rounded-lg ${accent}`}>{icon}</div>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLE[p.status]}`}>
+                        {p.status}
+                      </span>
+                    </div>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between mt-6">
-              <motion.button
-                onClick={prev}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.92 }}
-                className="p-3 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm"
-                aria-label="Projeto anterior"
-              >
-                <ChevronLeft size={20} className="text-gray-600" />
-              </motion.button>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{p.category}</p>
+                    <h3 className="font-bold text-gray-900 text-sm leading-snug mb-0.5">{p.title}</h3>
+                    <p className="text-xs text-gray-500 mb-auto line-clamp-2">{p.client}</p>
 
-              {/* Dots */}
-              <div className="flex gap-2 items-center">
-                {projects.map((proj, i) => {
-                  const dc = CAT_DOT[proj.category] ?? 'bg-gray-400';
-                  return (
-                    <motion.button
-                      key={i}
-                      onClick={() => go(i)}
-                      animate={{ width: i === current ? 24 : 10, opacity: i === current ? 1 : 0.4 }}
-                      transition={{ duration: 0.3 }}
-                      aria-label={`Projeto ${i + 1}`}
-                      className={`h-2.5 rounded-full ${i === current ? dc : 'bg-gray-300'}`}
-                    />
-                  );
-                })}
-              </div>
-
-              <motion.button
-                onClick={next}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.92 }}
-                className="p-3 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm"
-                aria-label="Próximo projeto"
-              >
-                <ChevronRight size={20} className="text-gray-600" />
-              </motion.button>
-            </div>
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {p.technologies.slice(0, 3).map((tech) => (
+                        <span key={tech} className={`px-2 py-0.5 rounded text-xs font-medium ${accent}`}>{tech}</span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </ScrollReveal>
       </div>
