@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Quote } from 'lucide-react';
-import { motion, useAnimationControls } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 interface Testimonial {
@@ -30,60 +30,34 @@ const FALLBACK: Testimonial[] = [
   },
 ];
 
-function TestimonialCard({ t }: { t: Testimonial }) {
-  const initials = t.name.split(' ').slice(0, 2).map((n) => n[0]).join('');
+const INITIALS_GRADIENT: Record<string, string> = {
+  blue:   'from-blue-400 to-blue-600',
+  purple: 'from-purple-400 to-violet-600',
+  pink:   'from-pink-400 to-rose-600',
+  green:  'from-emerald-400 to-green-600',
+};
 
-  return (
-    <motion.div
-      whileHover={{ y: -6, scale: 1.03 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-      className="w-80 shrink-0 rounded-2xl p-6 flex flex-col gap-5 cursor-default select-none relative overflow-hidden"
-      style={{
-        background: 'rgba(255,255,255,0.08)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-      }}
-    >
-      {/* Subtle inner glow top */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-
-      {/* Quote icon */}
-      <Quote className="w-9 h-9 text-blue-400/60" />
-
-      {/* Text */}
-      <p className="text-white/80 text-sm leading-relaxed flex-1">
-        "{t.text}"
-      </p>
-
-      {/* Author */}
-      <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-        {/* Avatar with pulse ring */}
-        <div className="relative shrink-0">
-          {/* Pulse ring */}
-          <motion.div
-            animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute inset-0 rounded-full bg-blue-400/40"
-          />
-          <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm ring-2 ring-white/20 z-10">
-            {initials}
-          </div>
-        </div>
-
-        <div>
-          <p className="font-semibold text-white text-sm">{t.name}</p>
-          <p className="text-white/50 text-xs">{t.role} · {t.company}</p>
-        </div>
-      </div>
-    </motion.div>
-  );
+function getCardProps(offset: number) {
+  if (offset === 0) return {
+    x: '0%', scale: 1, opacity: 1, zIndex: 20,
+    isCenter: true,
+  };
+  if (offset === 1 || offset === -1) return {
+    x: offset > 0 ? '68%' : '-68%',
+    scale: 0.82, opacity: 0.55, zIndex: 10,
+    isCenter: false,
+  };
+  return {
+    x: offset > 0 ? '120%' : '-120%',
+    scale: 0.7, opacity: 0, zIndex: 1,
+    isCenter: false,
+  };
 }
 
 export default function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(FALLBACK);
-  const controls = useAnimationControls();
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetch('/api/portfolio/testimonials')
@@ -92,32 +66,34 @@ export default function TestimonialsSection() {
       .catch(() => {});
   }, []);
 
-  const startMarquee = () =>
-    controls.start({
-      x: ['-50%', '0%'],
-      transition: { duration: 30, ease: 'linear', repeat: Infinity },
-    });
+  const startTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCurrent((c) => (c + 1) % testimonials.length);
+    }, 4500);
+  };
 
-  useEffect(() => { startMarquee(); }, [testimonials]);
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [testimonials.length]);
 
-  const pause  = () => controls.stop();
-  const resume = () => startMarquee();
-
-  const doubled = [...testimonials, ...testimonials];
+  const go = (i: number) => { setCurrent(i); startTimer(); };
+  const prev = () => go((current - 1 + testimonials.length) % testimonials.length);
+  const next = () => go((current + 1) % testimonials.length);
 
   return (
     <section
       id="depoimentos"
       className="py-20 overflow-hidden relative"
-      style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%)' }}
     >
-      {/* Background glow orbs */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
 
       {/* Header */}
       <ScrollReveal>
-        <div className="text-center space-y-4 mb-14 px-4 relative z-10">
+        <div className="text-center space-y-3 mb-16 px-4 relative z-10">
           <span className="inline-block px-4 py-2 bg-white/10 text-blue-300 rounded-full text-sm font-semibold border border-white/10">
             Depoimentos
           </span>
@@ -127,41 +103,105 @@ export default function TestimonialsSection() {
               meu trabalho
             </span>
           </h2>
-          <p className="text-white/30 text-sm">Passe o mouse para pausar</p>
         </div>
       </ScrollReveal>
 
-      {/* Marquee */}
-      <ScrollReveal delay={0.1}>
-        <div
-          className="relative"
-          onMouseEnter={pause}
-          onMouseLeave={resume}
+      {/* Carousel */}
+      <div className="relative max-w-5xl mx-auto px-16 sm:px-24">
+        {/* Cards */}
+        <div className="relative h-[420px] flex items-center justify-center">
+          {testimonials.map((t, i) => {
+            const len = testimonials.length;
+            let offset = i - current;
+            if (offset > len / 2)  offset -= len;
+            if (offset < -len / 2) offset += len;
+
+            const { x, scale, opacity, zIndex, isCenter } = getCardProps(offset);
+            const initials = t.name.split(' ').slice(0, 2).map((n) => n[0]).join('');
+            const gradient = INITIALS_GRADIENT[t.color] ?? INITIALS_GRADIENT.blue;
+
+            return (
+              <motion.div
+                key={t.name}
+                animate={{ x, scale, opacity }}
+                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                style={{ zIndex, position: 'absolute', width: '340px' }}
+                onClick={() => !isCenter && go(i)}
+                className={!isCenter ? 'cursor-pointer' : ''}
+              >
+                <div
+                  className={`rounded-2xl overflow-hidden transition-shadow duration-500 ${
+                    isCenter
+                      ? 'bg-white shadow-2xl shadow-black/50'
+                      : 'bg-white/10 border border-white/10'
+                  }`}
+                >
+                  {/* Avatar area */}
+                  <div className={`flex flex-col items-center pt-8 pb-5 px-6 ${isCenter ? '' : ''}`}>
+                    {/* Pulse ring only on active */}
+                    <div className="relative mb-4">
+                      {isCenter && (
+                        <motion.div
+                          animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
+                          transition={{ duration: 2.2, repeat: Infinity }}
+                          className="absolute inset-0 rounded-full bg-blue-400/40"
+                        />
+                      )}
+                      <div className={`relative w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-2xl ring-4 ${isCenter ? 'ring-white shadow-lg' : 'ring-white/20'}`}>
+                        {initials}
+                      </div>
+                    </div>
+
+                    <p className={`font-bold text-base ${isCenter ? 'text-gray-900' : 'text-white'}`}>
+                      {t.name}
+                    </p>
+                    <p className={`text-sm mt-0.5 ${isCenter ? 'text-gray-400' : 'text-white/50'}`}>
+                      {t.role} · {t.company}
+                    </p>
+                  </div>
+
+                  {/* Quote */}
+                  <div className={`mx-5 mb-6 rounded-xl px-5 py-4 ${isCenter ? 'bg-gray-50' : 'bg-white/5'}`}>
+                    <p className={`text-sm leading-relaxed text-center ${isCenter ? 'text-gray-600' : 'text-white/60'}`}>
+                      "{t.text}"
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Arrows */}
+        <motion.button
+          onClick={prev}
+          whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-900/50 z-30"
         >
-          {/* Left fade */}
-          <div
-            className="pointer-events-none absolute left-0 top-0 bottom-0 w-32 z-10"
-            style={{ background: 'linear-gradient(to right, #0f172a, transparent)' }}
-          />
-          {/* Right fade */}
-          <div
-            className="pointer-events-none absolute right-0 top-0 bottom-0 w-32 z-10"
-            style={{ background: 'linear-gradient(to left, #0f172a, transparent)' }}
-          />
+          <ChevronLeft size={20} className="text-white" />
+        </motion.button>
 
-          <div className="overflow-hidden py-6 px-4">
-            <motion.div
-              animate={controls}
-              className="flex gap-5"
-              style={{ width: 'max-content' }}
-            >
-              {doubled.map((t, i) => (
-                <TestimonialCard key={i} t={t} />
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </ScrollReveal>
+        <motion.button
+          onClick={next}
+          whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-900/50 z-30"
+        >
+          <ChevronRight size={20} className="text-white" />
+        </motion.button>
+      </div>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-2 mt-8">
+        {testimonials.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => go(i)}
+            className={`transition-all duration-300 rounded-full ${
+              i === current ? 'w-6 h-2.5 bg-blue-400' : 'w-2.5 h-2.5 bg-white/20 hover:bg-white/40'
+            }`}
+          />
+        ))}
+      </div>
     </section>
   );
 }
