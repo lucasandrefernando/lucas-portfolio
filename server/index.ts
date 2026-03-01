@@ -73,6 +73,7 @@ async function startServer() {
       port: 587,
       secure: false,
       auth: { user: smtpUser, pass: smtpPass },
+      tls: { rejectUnauthorized: false },
     });
 
     try {
