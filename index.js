@@ -22480,18 +22480,11 @@ var __dirname = path.dirname(__filename);
 async function startServer() {
   const app = (0, import_express.default)();
   const certDir = path.resolve(__dirname, "..", "certificado");
-  const certFiles = {
-    key: path.join(certDir, "private.key"),
-    cert: path.join(certDir, "certificate.crt"),
-    ca: path.join(certDir, "ca.crt")
-  };
-  const hasSSL = fs.existsSync(certFiles.key) && fs.existsSync(certFiles.cert);
+  const pemFile = fs.existsSync(certDir) ? fs.readdirSync(certDir).find((f) => f.startsWith("portfolio") && f.endsWith(".pem")) ?? fs.readdirSync(certDir).find((f) => f.endsWith(".pem")) : void 0;
+  const pemPath = pemFile ? path.join(certDir, pemFile) : void 0;
+  const hasSSL = !!pemPath && fs.existsSync(pemPath);
   const server = hasSSL ? createHttpsServer(
-    {
-      key: fs.readFileSync(certFiles.key),
-      cert: fs.readFileSync(certFiles.cert),
-      ...fs.existsSync(certFiles.ca) && { ca: fs.readFileSync(certFiles.ca) }
-    },
+    { key: fs.readFileSync(pemPath), cert: fs.readFileSync(pemPath) },
     app
   ) : createHttpServer(app);
   const productionPath = path.resolve(__dirname, "public");
