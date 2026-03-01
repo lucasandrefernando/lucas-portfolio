@@ -36631,7 +36631,9 @@ async function startServer() {
   const contactLimiter = rate_limit_default({
     windowMs: 15 * 60 * 1e3,
     // 15 minutos
-    max: 3,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
     message: { error: "Muitas tentativas. Aguarde 15 minutos e tente novamente." }
   });
   app.post("/api/contact", contactLimiter, async (req, res) => {
@@ -36676,7 +36678,7 @@ async function startServer() {
               <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
                 <tr><td style="padding:8px 0;color:#6b7280;font-size:13px;width:80px">Nome</td><td style="padding:8px 0;font-weight:600">${name}</td></tr>
                 <tr><td style="padding:8px 0;color:#6b7280;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${email}" style="color:#2563eb">${email}</a></td></tr>
-                ${phone?.trim() ? `<tr><td style="padding:8px 0;color:#6b7280;font-size:13px">WhatsApp</td><td style="padding:8px 0"><a href="https://wa.me/${phone.replace(/\D/g, "")}" style="color:#2563eb">${phone}</a></td></tr>` : ""}
+                <tr><td style="padding:8px 0;color:#6b7280;font-size:13px">WhatsApp</td><td style="padding:8px 0">${phone?.trim() ? `<a href="https://wa.me/${phone.replace(/\D/g, "")}" style="color:#2563eb">${phone}</a>` : '<span style="color:#9ca3af">N\xE3o informado</span>'}</td></tr>
               </table>
               <p style="color:#6b7280;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Mensagem</p>
               <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#fff;border-radius:4px;margin:0;color:#374151;line-height:1.6">
