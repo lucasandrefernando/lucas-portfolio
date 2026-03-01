@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Building2, BarChart3, Package, Globe, Wallet, Wrench, Briefcase, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
@@ -166,6 +166,7 @@ export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>(FALLBACK);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetch('/api/portfolio/projects')
@@ -174,12 +175,27 @@ export default function ProjectsSection() {
       .catch(() => {});
   }, []);
 
+  const startTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setDirection(1);
+      setCurrent((c) => (c + 1) % projects.length);
+    }, 5000);
+  };
+
   const go = (index: number) => {
     setDirection(index > current ? 1 : -1);
     setCurrent(index);
+    startTimer(); // reset timer on manual nav
   };
   const prev = () => go((current - 1 + projects.length) % projects.length);
   const next = () => go((current + 1) % projects.length);
+
+  // Auto-advance every 5s
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [projects.length]);
 
   const p = projects[current];
   const gradient = CAT_GRADIENT[p.category] ?? CAT_GRADIENT['Saúde'];
