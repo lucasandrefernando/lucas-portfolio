@@ -1,0 +1,18 @@
+{
+  "name": "Lucas André — Full Stack Developer",
+  "short_name": "Lucas André",
+  "description": "Portfólio de Lucas André Fernando — Full Stack Developer com 10+ anos de experiência em PHP, React e Node.js.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563EB",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/foto.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
