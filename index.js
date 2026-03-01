@@ -22469,7 +22469,8 @@ var require_express2 = __commonJS({
 
 // server/index.ts
 var import_express = __toESM(require_express2(), 1);
-import { createServer } from "http";
+import { createServer as createHttpServer } from "http";
+import { createServer as createHttpsServer } from "https";
 import { exec } from "child_process";
 import path from "path";
 import fs from "fs";
@@ -22478,7 +22479,21 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 async function startServer() {
   const app = (0, import_express.default)();
-  const server = createServer(app);
+  const certDir = path.resolve(__dirname, "..", "certificado");
+  const certFiles = {
+    key: path.join(certDir, "private.key"),
+    cert: path.join(certDir, "certificate.crt"),
+    ca: path.join(certDir, "ca.crt")
+  };
+  const hasSSL = fs.existsSync(certFiles.key) && fs.existsSync(certFiles.cert);
+  const server = hasSSL ? createHttpsServer(
+    {
+      key: fs.readFileSync(certFiles.key),
+      cert: fs.readFileSync(certFiles.cert),
+      ...fs.existsSync(certFiles.ca) && { ca: fs.readFileSync(certFiles.ca) }
+    },
+    app
+  ) : createHttpServer(app);
   const productionPath = path.resolve(__dirname, "public");
   const devPath = path.resolve(__dirname, "..", "dist", "public");
   const staticPath = fs.existsSync(path.join(productionPath, "index.html")) ? productionPath : devPath;
@@ -22519,7 +22534,7 @@ async function startServer() {
   const kingHostPort = Object.entries(process.env).find(([key]) => key.startsWith("PORT_"))?.[1];
   const port = kingHostPort || process.env.PORT || 3e3;
   server.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${port} (${hasSSL ? "HTTPS" : "HTTP"})`);
   });
   const shutdown = () => {
     server.close(() => process.exit(0));
