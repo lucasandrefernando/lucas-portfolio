@@ -76,22 +76,32 @@ async function startServer() {
       tls: { rejectUnauthorized: false },
     });
 
+    const now = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "full", timeStyle: "short" });
+
     try {
-      // Email para Lucas
+      // Notificação para Lucas
       await transporter.sendMail({
         from: `"Portfolio" <${smtpUser}>`,
         to: "lucas@anacron.com.br",
         replyTo: email,
         subject: `[Portfolio] Nova mensagem de ${name}`,
         html: `
-          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-            <h2 style="color:#2563eb">Nova mensagem pelo portfólio</h2>
-            <p><strong>Nome:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Mensagem:</strong></p>
-            <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#f1f5f9;border-radius:4px">
-              ${message.replace(/\n/g, "<br>")}
-            </blockquote>
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+            <div style="background:#2563eb;padding:24px 32px;border-radius:8px 8px 0 0">
+              <h2 style="color:#fff;margin:0;font-size:20px">Nova mensagem pelo portfólio</h2>
+              <p style="color:#bfdbfe;margin:4px 0 0;font-size:13px">${now}</p>
+            </div>
+            <div style="background:#f8fafc;padding:24px 32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px">
+              <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+                <tr><td style="padding:8px 0;color:#6b7280;font-size:13px;width:80px">Nome</td><td style="padding:8px 0;font-weight:600">${name}</td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${email}" style="color:#2563eb">${email}</a></td></tr>
+              </table>
+              <p style="color:#6b7280;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Mensagem</p>
+              <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#fff;border-radius:4px;margin:0;color:#374151;line-height:1.6">
+                ${message.replace(/\n/g, "<br>")}
+              </blockquote>
+              <p style="margin-top:20px;font-size:13px;color:#6b7280">Responda diretamente a este email para contatar ${name}.</p>
+            </div>
           </div>
         `,
       });
@@ -100,21 +110,48 @@ async function startServer() {
       await transporter.sendMail({
         from: `"Lucas André" <${smtpUser}>`,
         to: email,
-        subject: "Recebi sua mensagem — Lucas André",
+        subject: `Olá, ${name}! Recebi sua mensagem — Lucas André`,
         html: `
-          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-            <h2 style="color:#2563eb">Olá, ${name}!</h2>
-            <p>Recebi sua mensagem e responderei em até <strong>24 horas úteis</strong>.</p>
-            <p style="color:#6b7280">Sua mensagem:</p>
-            <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#f1f5f9;border-radius:4px;color:#374151">
-              ${message.replace(/\n/g, "<br>")}
-            </blockquote>
-            <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-            <p style="color:#6b7280;font-size:14px">
-              Lucas André · Full Stack Developer<br>
-              <a href="https://portfolio.anacron.com.br:21017" style="color:#2563eb">portfolio.anacron.com.br</a> ·
-              <a href="https://linkedin.com/in/lucas-andre-fernando" style="color:#2563eb">LinkedIn</a>
-            </p>
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1f2937">
+            <div style="background:linear-gradient(135deg,#1e40af,#7c3aed);padding:32px;border-radius:8px 8px 0 0;text-align:center">
+              <h1 style="color:#fff;margin:0;font-size:22px">Mensagem recebida!</h1>
+              <p style="color:#c7d2fe;margin:8px 0 0;font-size:14px">Entrarei em contato em breve</p>
+            </div>
+            <div style="background:#f8fafc;padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px">
+              <p style="margin-top:0">Olá, <strong>${name}</strong>!</p>
+              <p style="line-height:1.7;color:#374151">Recebi sua mensagem e já está na minha fila de leitura. Responderei em até <strong>24 horas úteis</strong> com uma resposta personalizada para o seu caso.</p>
+
+              <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:16px;margin:20px 0">
+                <p style="margin:0 0 8px;font-size:12px;font-weight:600;color:#1e40af;text-transform:uppercase;letter-spacing:.05em">Sua mensagem</p>
+                <p style="margin:0;color:#374151;line-height:1.6;font-style:italic">"${message.replace(/\n/g, "<br>")}"</p>
+              </div>
+
+              <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+
+              <p style="margin:0 0 4px;font-weight:600">Lucas André</p>
+              <p style="margin:0 0 16px;color:#6b7280;font-size:14px">Full Stack Developer · 10+ anos de experiência</p>
+
+              <table style="width:100%;border-collapse:collapse">
+                <tr>
+                  <td style="padding:4px 0;font-size:14px;color:#6b7280">Portfólio</td>
+                  <td style="padding:4px 0;font-size:14px"><a href="https://portfolio.anacron.com.br:21017" style="color:#2563eb">portfolio.anacron.com.br</a></td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0;font-size:14px;color:#6b7280">LinkedIn</td>
+                  <td style="padding:4px 0;font-size:14px"><a href="https://linkedin.com/in/lucas-andre-fernando" style="color:#2563eb">lucas-andre-fernando</a></td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0;font-size:14px;color:#6b7280">WhatsApp</td>
+                  <td style="padding:4px 0;font-size:14px"><a href="https://wa.me/5531995420887" style="color:#2563eb">+55 (31) 99542-0887</a></td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0;font-size:14px;color:#6b7280">Email</td>
+                  <td style="padding:4px 0;font-size:14px"><a href="mailto:lucas@anacron.com.br" style="color:#2563eb">lucas@anacron.com.br</a></td>
+                </tr>
+              </table>
+
+              <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;text-align:center">Esta é uma confirmação automática. Para urgências, entre em contato pelo WhatsApp.</p>
+            </div>
           </div>
         `,
       });
