@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, GraduationCap, Award } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { GraduationCap, Award } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
 
 interface Experience {
@@ -85,7 +84,6 @@ const FALLBACK_EDUCATION: EducationItem[] = [
 export default function ExperienceSection() {
   const [experiences, setExperiences] = useState<Experience[]>(FALLBACK_EXPERIENCES);
   const [education, setEducation] = useState<EducationItem[]>(FALLBACK_EDUCATION);
-  const [openIndex, setOpenIndex] = useState<number>(0);
 
   useEffect(() => {
     fetch('/api/portfolio/experiences')
@@ -102,14 +100,12 @@ export default function ExperienceSection() {
   const degrees = education.filter((e) => e.type === 'degree');
   const certifications = education.filter((e) => e.type === 'certification');
 
-  const toggle = (i: number) => setOpenIndex(openIndex === i ? -1 : i);
-
   return (
     <section id="experiencia" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
-        <ScrollReveal className="text-center mb-12">
+        <ScrollReveal className="text-center mb-14">
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Experiência Profissional
           </span>
@@ -119,79 +115,65 @@ export default function ExperienceSection() {
           </p>
         </ScrollReveal>
 
-        {/* Accordion */}
-        <ScrollReveal delay={0.1}>
-          <div className="divide-y divide-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
-            {experiences.map((exp, index) => {
-              const isOpen = openIndex === index;
-              return (
-                <div key={index}>
-                  <button
-                    onClick={() => toggle(index)}
-                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4 min-w-0">
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}`} />
-                      <div className="min-w-0">
-                        <span className="font-semibold text-gray-900">{exp.position}</span>
-                        <span className="text-gray-400 mx-2">·</span>
-                        <span className="text-gray-600">{exp.company}</span>
-                      </div>
+        {/* Timeline */}
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500 via-blue-300 to-gray-200" />
+
+          <div className="space-y-10">
+            {experiences.map((exp, index) => (
+              <ScrollReveal key={index} delay={index * 0.1}>
+                <div className="flex gap-6">
+                  {/* Dot */}
+                  <div className="relative shrink-0 mt-1">
+                    <div className={`w-4 h-4 rounded-full border-2 ${
+                      index === 0
+                        ? 'bg-blue-500 border-blue-500 shadow-[0_0_0_4px_rgba(59,130,246,0.15)]'
+                        : 'bg-white border-gray-300'
+                    }`} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 pb-2">
+                    {/* Role + Period */}
+                    <div className="flex flex-wrap items-baseline justify-between gap-2 mb-0.5">
+                      <h3 className="text-lg font-bold text-gray-900">{exp.position}</h3>
+                      <span className="text-sm text-gray-400 font-medium shrink-0">{exp.period}</span>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-sm text-gray-400 hidden sm:block">{exp.period}</span>
-                      <ChevronDown
-                        size={18}
-                        className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                      />
+
+                    {/* Company */}
+                    <p className="text-sm font-semibold text-blue-600 mb-3">{exp.company}</p>
+
+                    {/* Description */}
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4">{exp.description}</p>
+
+                    {/* Highlights */}
+                    <ul className="space-y-1.5 mb-4">
+                      {exp.highlights.map((h, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                          <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
+                          <span>{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Technologies */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {exp.technologies.map((tech, i) => (
+                        <span key={i} className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
+                          {tech}
+                        </span>
+                      ))}
                     </div>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key="content"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-6 pb-6 pt-1 bg-gray-50 border-t border-gray-100">
-                          <p className="text-sm text-blue-600 font-medium mb-4 sm:hidden">{exp.period}</p>
-                          <p className="text-gray-600 leading-relaxed mb-5">{exp.description}</p>
-
-                          <div className="mb-5">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Principais entregas</p>
-                            <ul className="space-y-2">
-                              {exp.highlights.map((h, i) => (
-                                <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                                  <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
-                                  <span>{h}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="flex flex-wrap gap-2">
-                            {exp.technologies.map((tech, i) => (
-                              <span key={i} className="px-2.5 py-1 bg-white border border-gray-200 text-gray-600 rounded-md text-xs font-medium">
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  </div>
                 </div>
-              );
-            })}
+              </ScrollReveal>
+            ))}
           </div>
-        </ScrollReveal>
+        </div>
 
         {/* Education */}
-        <ScrollReveal delay={0.2} className="mt-16 pt-12 border-t border-gray-100">
+        <ScrollReveal delay={0.15} className="mt-16 pt-12 border-t border-gray-100">
           <h3 className="text-xl font-bold text-gray-900 mb-6">Formação Acadêmica</h3>
 
           <div className="space-y-4">
