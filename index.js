@@ -36656,7 +36656,8 @@ async function startServer() {
       host: smtpHost,
       port: 587,
       secure: false,
-      auth: { user: smtpUser, pass: smtpPass }
+      auth: { user: smtpUser, pass: smtpPass },
+      tls: { rejectUnauthorized: false }
     });
     try {
       await transporter.sendMail({
