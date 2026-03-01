@@ -22521,6 +22521,11 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });
+  const shutdown = () => {
+    server.close(() => process.exit(0));
+  };
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
 startServer().catch(console.error);
 /*! Bundled license information:
