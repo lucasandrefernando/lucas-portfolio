@@ -1,39 +1,35 @@
 import { useState } from 'react';
-import { Mail, Linkedin, Github, MessageCircle, Send } from 'lucide-react';
+import { Mail, Linkedin, Github, MessageCircle, Send, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error('Por favor, preencha todos os campos');
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      toast.error('Preencha todos os campos.');
       return;
     }
-
     setIsLoading(true);
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Erro desconhecido');
+      setSent(true);
       setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      toast.error('Erro ao enviar mensagem. Tente novamente.');
+    } catch (err: any) {
+      toast.error(err.message ?? 'Erro ao enviar. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -44,178 +40,84 @@ export default function ContactSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold mb-4">
-            Vamos Trabalhar Juntos?
+            Contato
           </span>
-          <h2 className="text-4xl font-bold mb-4">
-            Tem um Problema para Resolver?
-          </h2>
+          <h2 className="text-4xl font-bold mb-4">Tem um Problema para Resolver?</h2>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Seja um sistema do zero, uma automação que vai economizar horas do seu time ou uma integração com IA — estou disponível para discutir como posso ajudar.
+            Seja um sistema do zero, uma automação ou integração com IA — estou disponível para
+            discutir como posso ajudar.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Contact Info */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              {/* Email */}
-              <div className="flex items-start gap-4">
-                <div className="p-4 bg-blue-500/20 rounded-lg">
-                  <Mail className="w-6 h-6 text-blue-400" />
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Info */}
+          <div className="space-y-6">
+            {[
+              { icon: <Mail className="w-5 h-5 text-blue-400" />, label: 'Email', value: 'lucas@anacron.com.br', href: 'mailto:lucas@anacron.com.br' },
+              { icon: <Linkedin className="w-5 h-5 text-blue-400" />, label: 'LinkedIn', value: 'lucas-andre-fernando', href: 'https://linkedin.com/in/lucas-andre-fernando' },
+              { icon: <Github className="w-5 h-5 text-blue-400" />, label: 'GitHub', value: 'lucasandrefernando', href: 'https://github.com/lucasandrefernando' },
+              { icon: <MessageCircle className="w-5 h-5 text-blue-400" />, label: 'WhatsApp', value: '+55 (31) 99542-0887', href: 'https://wa.me/5531995420887' },
+            ].map(({ icon, label, value, href }) => (
+              <div key={label} className="flex items-center gap-4">
+                <div className="p-3 bg-blue-500/20 rounded-lg shrink-0">{icon}</div>
                 <div>
-                  <h3 className="text-lg font-bold mb-1">Email</h3>
-                  <p className="text-gray-300">lucas@anacron.com.br</p>
-                </div>
-              </div>
-
-              {/* LinkedIn */}
-              <div className="flex items-start gap-4">
-                <div className="p-4 bg-blue-500/20 rounded-lg">
-                  <Linkedin className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold mb-1">LinkedIn</h3>
-                  <a
-                    href="https://linkedin.com/in/lucas-andre-fernando"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    linkedin.com/in/lucas-andre-fernando
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{label}</p>
+                  <a href={href} target="_blank" rel="noopener noreferrer"
+                    className="text-white hover:text-blue-300 transition-colors font-medium">
+                    {value}
                   </a>
                 </div>
               </div>
+            ))}
 
-              {/* GitHub */}
-              <div className="flex items-start gap-4">
-                <div className="p-4 bg-blue-500/20 rounded-lg">
-                  <Github className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold mb-1">GitHub</h3>
-                  <a
-                    href="https://github.com/lucasandrefernando"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    github.com/lucasandrefernando
-                  </a>
-                </div>
-              </div>
-
-              {/* WhatsApp */}
-              <div className="flex items-start gap-4">
-                <div className="p-4 bg-blue-500/20 rounded-lg">
-                  <MessageCircle className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold mb-1">WhatsApp</h3>
-                  <a
-                    href="https://wa.me/5531995420887"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    +55 (31) 99542-0887
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div className="pt-8 border-t border-gray-700">
-              <p className="text-gray-400 text-sm mb-4">Conecte-se comigo nas redes sociais:</p>
-              <div className="flex gap-4">
-                <a
-                  href="https://linkedin.com/in/lucas-andre-fernando"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
-                >
-                  <Linkedin className="w-6 h-6 text-blue-400" />
-                </a>
-                <a
-                  href="https://github.com/lucasandrefernando"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
-                >
-                  <Github className="w-6 h-6 text-blue-400" />
-                </a>
-                <a
-                  href="mailto:lucas@anacron.com.br"
-                  className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
-                >
-                  <Mail className="w-6 h-6 text-blue-400" />
-                </a>
-              </div>
+            <div className="pt-6 border-t border-gray-700">
+              <p className="text-gray-400 text-sm mb-1">Tempo de resposta médio</p>
+              <p className="text-white font-semibold">Até 24 horas úteis</p>
             </div>
           </div>
 
-          {/* Right - Contact Form */}
-          <form onSubmit={handleSubmit} className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700">
-            <div className="space-y-6">
-              {/* Name Input */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-semibold mb-2">
-                  Seu Nome
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="João Silva"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              {/* Email Input */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold mb-2">
-                  Seu Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="lucas@anacron.com.br"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              {/* Message Input */}
-              <div>
-                <label htmlFor="message" className="block text-sm font-semibold mb-2">
-                  Descreva seu Projeto
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Qual problema você precisa resolver? Quanto mais detalhes, melhor..."
-                  rows={5}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Enviando...' : 'Enviar Mensagem'}
-                <Send size={20} />
+          {/* Form */}
+          {sent ? (
+            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-10 flex flex-col items-center justify-center text-center gap-4">
+              <CheckCircle className="w-16 h-16 text-green-400" />
+              <h3 className="text-xl font-bold">Mensagem enviada!</h3>
+              <p className="text-gray-400">
+                Você receberá uma confirmação no seu email. Responderei em até 24 horas úteis.
+              </p>
+              <button onClick={() => setSent(false)}
+                className="mt-2 text-sm text-blue-400 hover:text-blue-300 transition-colors underline">
+                Enviar outra mensagem
               </button>
             </div>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 space-y-5">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold mb-2">Seu Nome</label>
+                <input type="text" id="name" name="name" value={formData.name} onChange={handleChange}
+                  placeholder="João Silva" required
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors" />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold mb-2">Seu Email</label>
+                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange}
+                  placeholder="joao@empresa.com.br" required
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors" />
+              </div>
+              <div>
+                <label htmlFor="message" className="block text-sm font-semibold mb-2">Como posso ajudar?</label>
+                <textarea id="message" name="message" value={formData.message} onChange={handleChange}
+                  placeholder="Descreva seu projeto ou necessidade. Quanto mais detalhes, melhor..." rows={5} required
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors resize-none" />
+              </div>
+              <button type="submit" disabled={isLoading}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all font-semibold flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100">
+                {isLoading ? 'Enviando...' : (<>Enviar Mensagem <Send size={18} /></>)}
+              </button>
+              <p className="text-xs text-gray-500 text-center">
+                Você receberá uma confirmação automática no seu email.
+              </p>
+            </form>
+          )}
         </div>
       </div>
     </section>

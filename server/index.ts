@@ -1,16 +1,18 @@
 import express from "express";
 import { createServer as createHttpServer } from "http";
 import { createServer as createHttpsServer } from "https";
-import { exec } from "child_process";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import nodemailer from "nodemailer";
+import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
+  app.use(express.json());
 
   // Tenta carregar certificado SSL do KingHost (~/apps_nodejs/certificado/*.pem)
   // O arquivo .pem do KingHost contém chave + certificado + CA em um único arquivo
@@ -31,57 +33,101 @@ async function startServer() {
     : createHttpServer(app);
 
   // Auto-detecta o caminho dos arquivos estaticos
-  // Em producao (KingHost): public/ fica na mesma pasta que index.js
-  // Em dev local: dist/public/
   const productionPath = path.resolve(__dirname, "public");
   const devPath = path.resolve(__dirname, "..", "dist", "public");
   const staticPath = fs.existsSync(path.join(productionPath, "index.html"))
     ? productionPath
     : devPath;
 
-  // ── Deploy webhook ───────────────────────────────────────────────────────
-  // GitHub Actions envia os arquivos buildados como tar.gz via POST HTTP.
-  // Isso evita dependencia de SSH/FTP que sao bloqueados por IP no KingHost.
-  app.post("/api/deploy", (req, res) => {
-    const token = req.headers["x-deploy-token"];
-    const deployToken = process.env.DEPLOY_TOKEN;
+  // ── Contato ──────────────────────────────────────────────────────────────
+  const contactLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 3,
+    message: { error: "Muitas tentativas. Aguarde 15 minutos e tente novamente." },
+  });
 
-    if (!deployToken) {
-      return res.status(503).json({ error: "DEPLOY_TOKEN not configured on server" });
+  app.post("/api/contact", contactLimiter, async (req, res) => {
+    const { name, email, message } = req.body ?? {};
+
+    if (!name?.trim() || !email?.trim() || !message?.trim()) {
+      return res.status(400).json({ error: "Preencha todos os campos." });
     }
-    if (token !== deployToken) {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Email inválido." });
+    }
+    if (message.trim().length < 10) {
+      return res.status(400).json({ error: "Mensagem muito curta." });
     }
 
-    const tmpFile = `/tmp/deploy-${Date.now()}.tar.gz`;
-    const writeStream = fs.createWriteStream(tmpFile);
+    const smtpHost = process.env.SMTP_HOST ?? "mail.anacron.com.br";
+    const smtpUser = process.env.SMTP_USER ?? "lucas@anacron.com.br";
+    const smtpPass = process.env.SMTP_PASS;
 
-    req.pipe(writeStream);
+    if (!smtpPass) {
+      console.error("[contact] SMTP_PASS não configurado");
+      return res.status(503).json({ error: "Serviço de email não configurado." });
+    }
 
-    writeStream.on("finish", () => {
-      // Responde antes de extrair para nao ser cortado pelo restart do PM2
-      res.json({ success: true, message: "Deploy recebido, extraindo arquivos..." });
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: 587,
+      secure: false,
+      auth: { user: smtpUser, pass: smtpPass },
+    });
 
-      exec(`tar -xzf ${tmpFile} -C ${__dirname}`, (err, _stdout, stderr) => {
-        fs.unlink(tmpFile, () => {});
-        if (err) {
-          console.error("[deploy] Erro ao extrair:", stderr);
-        } else {
-          console.log("[deploy] Arquivos atualizados - PM2 vai reiniciar automaticamente");
-        }
+    try {
+      // Email para Lucas
+      await transporter.sendMail({
+        from: `"Portfolio" <${smtpUser}>`,
+        to: "lucas@anacron.com.br",
+        replyTo: email,
+        subject: `[Portfolio] Nova mensagem de ${name}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#2563eb">Nova mensagem pelo portfólio</h2>
+            <p><strong>Nome:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Mensagem:</strong></p>
+            <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#f1f5f9;border-radius:4px">
+              ${message.replace(/\n/g, "<br>")}
+            </blockquote>
+          </div>
+        `,
       });
-    });
 
-    writeStream.on("error", (err) => {
-      if (!res.headersSent) {
-        res.status(500).json({ error: err.message });
-      }
-    });
+      // Confirmação automática para o remetente
+      await transporter.sendMail({
+        from: `"Lucas André" <${smtpUser}>`,
+        to: email,
+        subject: "Recebi sua mensagem — Lucas André",
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#2563eb">Olá, ${name}!</h2>
+            <p>Recebi sua mensagem e responderei em até <strong>24 horas úteis</strong>.</p>
+            <p style="color:#6b7280">Sua mensagem:</p>
+            <blockquote style="border-left:4px solid #2563eb;padding:12px 16px;background:#f1f5f9;border-radius:4px;color:#374151">
+              ${message.replace(/\n/g, "<br>")}
+            </blockquote>
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+            <p style="color:#6b7280;font-size:14px">
+              Lucas André · Full Stack Developer<br>
+              <a href="https://portfolio.anacron.com.br:21017" style="color:#2563eb">portfolio.anacron.com.br</a> ·
+              <a href="https://linkedin.com/in/lucas-andre-fernando" style="color:#2563eb">LinkedIn</a>
+            </p>
+          </div>
+        `,
+      });
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error("[contact] Erro ao enviar email:", err);
+      res.status(500).json({ error: "Erro ao enviar mensagem. Tente novamente." });
+    }
   });
 
   app.use(express.static(staticPath));
 
-  // React Router - todas as rotas servem o index.html
+  // React Router — todas as rotas servem o index.html
   app.get("*", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
@@ -96,10 +142,7 @@ async function startServer() {
   });
 
   // Graceful shutdown: fecha o servidor antes de sair para liberar a porta
-  // Necessário para o PM2 conseguir reiniciar sem EADDRINUSE
-  const shutdown = () => {
-    server.close(() => process.exit(0));
-  };
+  const shutdown = () => { server.close(() => process.exit(0)); };
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 }
