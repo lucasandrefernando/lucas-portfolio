@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -28,18 +29,24 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Create deployment archive
-        run: tar -czf deploy.tar.gz -C dist .
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ftp.anacron.com.br
+          username: anacron
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: /apps_nodejs/portfolio/
+          exclude: |
+            **/.git*
+            **/.git*/**
 
-      - name: Send to server via webhook
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-          SERVER_URL: ${{ secrets.SERVER_URL }}
+      - name: Deployment Summary
+        if: always()
         run: |
-          curl -X POST "${SERVER_URL}/api/deploy" \
-            -H "x-deploy-token: ${DEPLOY_TOKEN}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @deploy.tar.gz \
-            --fail \
-            --max-time 120
-          echo "Deploy enviado com sucesso!"
+          echo "## Deploy Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: http://anacron.com.br:21017" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date)" >> $GITHUB_STEP_SUMMARY
