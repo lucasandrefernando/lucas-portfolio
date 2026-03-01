@@ -28,120 +28,24 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Deploy via FTP
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          python3 - << 'PYEOF'
-          import ftplib, os, pathlib, ssl, sys
+      - name: Upload files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          source: "dist/index.js,dist/public"
+          target: "/home/anacron/apps_nodejs/portfolio"
+          strip_components: 1
 
-          host     = os.environ['FTP_HOST']
-          user     = os.environ['FTP_USER']
-          password = os.environ['FTP_PASSWORD']
-
-          # ── Connect (plain FTP first, then FTPS) ──────────────────────────────
-          ftp = None
-          for use_tls in [False, True]:
-              label = 'FTPS' if use_tls else 'FTP'
-              try:
-                  if use_tls:
-                      ctx = ssl.create_default_context()
-                      ctx.check_hostname = False
-                      ctx.verify_mode = ssl.CERT_NONE
-                      ftp = ftplib.FTP_TLS(context=ctx, timeout=30)
-                  else:
-                      ftp = ftplib.FTP(timeout=30)
-                  ftp.connect(host, 21)
-                  ftp.login(user, password)
-                  if use_tls:
-                      ftp.prot_p()
-                  print(f"Connected via {label}")
-                  break
-              except Exception as e:
-                  print(f"{label} failed: {e}")
-                  ftp = None
-
-          if not ftp:
-              print("Cannot connect to FTP server")
-              sys.exit(1)
-
-          # ── Show root listing ─────────────────────────────────────────────────
-          print("\n=== FTP Root Listing ===")
-          try:
-              ftp.retrlines('LIST', lambda l: print(f"  {l}"))
-          except Exception as e:
-              print(f"  (listing failed: {e})")
-
-          # ── Navigate to deployment directory ──────────────────────────────────
-          # FTP chroot is inside apps_nodejs/ — try portfolio/ first,
-          # then fall back to uploading at root (if chroot IS portfolio/).
-          print("\n=== Navigating to deployment directory ===")
-          in_portfolio = False
-          try:
-              ftp.cwd('portfolio')
-              print("  CWD portfolio: OK  (chroot = apps_nodejs/)")
-              in_portfolio = True
-          except ftplib.error_perm as e:
-              print(f"  CWD portfolio failed: {e}")
-              print("  Assuming chroot is already apps_nodejs/portfolio/ — uploading at root")
-              in_portfolio = True  # proceed anyway
-
-          # ── Upload files ──────────────────────────────────────────────────────
-          print("\n=== Uploading files ===")
-
-          # Upload server bundle
-          try:
-              with open('dist/index.js', 'rb') as f:
-                  ftp.storbinary('STOR index.js', f)
-              print("  index.js: OK")
-          except Exception as e:
-              print(f"  index.js: FAILED - {e}")
-              sys.exit(1)
-
-          # Recursive upload of a local directory into the current FTP directory
-          def upload_dir(local: pathlib.Path):
-              for item in sorted(local.iterdir()):
-                  if item.is_file():
-                      try:
-                          with open(item, 'rb') as f:
-                              ftp.storbinary(f'STOR {item.name}', f)
-                          print(f"  {item.relative_to(pathlib.Path('dist'))}: OK")
-                      except Exception as e:
-                          print(f"  {item.name}: FAILED - {e}")
-                  elif item.is_dir():
-                      try:
-                          ftp.cwd(item.name)
-                      except ftplib.error_perm:
-                          try:
-                              ftp.mkd(item.name)
-                              ftp.cwd(item.name)
-                          except Exception as e:
-                              print(f"  Cannot enter dir '{item.name}': {e}")
-                              continue
-                      print(f"  [{item.name}/]")
-                      upload_dir(item)
-                      ftp.cwd('..')
-
-          # Enter (or create) public/ and upload recursively
-          try:
-              ftp.cwd('public')
-          except ftplib.error_perm:
-              ftp.mkd('public')
-              ftp.cwd('public')
-          print("  [public/]")
-          upload_dir(pathlib.Path('dist/public'))
-
-          ftp.quit()
-          print("\nDeploy complete!")
-          PYEOF
-
-      - name: Deployment Status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "Deploy concluido com sucesso!"
-          else
-            echo "Deploy falhou!"
-          fi
+      - name: Restart PM2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            pm2 restart portfolio 2>/dev/null || \
+            pm2 start /home/anacron/apps_nodejs/portfolio/index.js --name portfolio
