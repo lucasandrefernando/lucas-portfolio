@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Briefcase, Calendar } from 'lucide-react';
+import { ChevronDown, GraduationCap, Award } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 interface Experience {
@@ -84,6 +85,7 @@ const FALLBACK_EDUCATION: EducationItem[] = [
 export default function ExperienceSection() {
   const [experiences, setExperiences] = useState<Experience[]>(FALLBACK_EXPERIENCES);
   const [education, setEducation] = useState<EducationItem[]>(FALLBACK_EDUCATION);
+  const [openIndex, setOpenIndex] = useState<number>(0);
 
   useEffect(() => {
     fetch('/api/portfolio/experiences')
@@ -100,9 +102,13 @@ export default function ExperienceSection() {
   const degrees = education.filter((e) => e.type === 'degree');
   const certifications = education.filter((e) => e.type === 'certification');
 
+  const toggle = (i: number) => setOpenIndex(openIndex === i ? -1 : i);
+
   return (
     <section id="experiencia" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-3xl mx-auto">
+
+        {/* Header */}
         <ScrollReveal className="text-center mb-12">
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Experiência Profissional
@@ -113,72 +119,109 @@ export default function ExperienceSection() {
           </p>
         </ScrollReveal>
 
-        <div className="space-y-8">
-          {experiences.map((exp, index) => (
-            <ScrollReveal key={index} delay={index * 0.1}>
-              <div className="bg-gray-50 rounded-xl p-8 border-l-4 border-blue-600 hover:shadow-lg transition-all duration-300">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="p-3 bg-blue-100 rounded-lg">
-                        <Briefcase className="w-6 h-6 text-blue-600" />
+        {/* Accordion */}
+        <ScrollReveal delay={0.1}>
+          <div className="divide-y divide-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
+            {experiences.map((exp, index) => {
+              const isOpen = openIndex === index;
+              return (
+                <div key={index}>
+                  <button
+                    onClick={() => toggle(index)}
+                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                      <div className="min-w-0">
+                        <span className="font-semibold text-gray-900">{exp.position}</span>
+                        <span className="text-gray-400 mx-2">·</span>
+                        <span className="text-gray-600">{exp.company}</span>
                       </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-gray-900">{exp.position}</h3>
-                        <p className="text-lg text-gray-600 font-semibold">{exp.company}</p>
-                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600 mb-4">
-                      <Calendar size={18} />
-                      <span className="font-medium">{exp.period}</span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-sm text-gray-400 hidden sm:block">{exp.period}</span>
+                      <ChevronDown
+                        size={18}
+                        className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                      />
                     </div>
-                    <p className="text-gray-700 leading-relaxed mb-6">{exp.description}</p>
-                    <div className="space-y-2">
-                      <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Principais Entregas</p>
-                      <ul className="space-y-2">
-                        {exp.highlights.map((h, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-700">
-                            <span className="text-blue-600 font-bold mt-1">•</span>
-                            <span>{h}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">Tecnologias</p>
-                    <div className="flex flex-wrap gap-2">
-                      {exp.technologies.map((tech, i) => (
-                        <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 pt-1 bg-gray-50 border-t border-gray-100">
+                          <p className="text-sm text-blue-600 font-medium mb-4 sm:hidden">{exp.period}</p>
+                          <p className="text-gray-600 leading-relaxed mb-5">{exp.description}</p>
+
+                          <div className="mb-5">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Principais entregas</p>
+                            <ul className="space-y-2">
+                              {exp.highlights.map((h, i) => (
+                                <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                  <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
+                                  <span>{h}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            {exp.technologies.map((tech, i) => (
+                              <span key={i} className="px-2.5 py-1 bg-white border border-gray-200 text-gray-600 rounded-md text-xs font-medium">
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        </ScrollReveal>
 
         {/* Education */}
-        <ScrollReveal className="mt-16 pt-16 border-t border-gray-200">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">Formação Acadêmica</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <ScrollReveal delay={0.2} className="mt-16 pt-12 border-t border-gray-100">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">Formação Acadêmica</h3>
+
+          <div className="space-y-4">
             {degrees.map((d, i) => (
-              <div key={i} className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-200">
-                <h4 className="text-xl font-bold text-gray-900 mb-2">{d.title}</h4>
-                {d.institution && <p className="text-gray-600 font-semibold mb-2">{d.institution}</p>}
-                {d.period && <p className="text-gray-600">{d.period}</p>}
+              <div key={i} className="flex items-start gap-4 p-5 rounded-xl border border-blue-100 bg-blue-50">
+                <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+                  <GraduationCap className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{d.title}</p>
+                  {d.institution && <p className="text-sm text-gray-600">{d.institution}</p>}
+                  {d.period && <p className="text-xs text-gray-400 mt-1">{d.period}</p>}
+                </div>
               </div>
             ))}
 
             {certifications.length > 0 && (
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 border border-purple-200">
-                <h4 className="text-xl font-bold text-gray-900 mb-4">Certificações</h4>
-                <ul className="space-y-2 text-gray-600">
+              <div className="p-5 rounded-xl border border-purple-100 bg-purple-50">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-purple-100 rounded-lg shrink-0">
+                    <Award className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <p className="font-semibold text-gray-900">Certificações</p>
+                </div>
+                <ul className="space-y-2 pl-1">
                   {certifications.map((c, i) => (
-                    <li key={i}>• {c.title}{c.institution ? ` — ${c.institution}` : ''}</li>
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                      <span className="text-purple-400 shrink-0">•</span>
+                      <span>{c.title}{c.institution ? <span className="text-gray-400"> — {c.institution}</span> : ''}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
