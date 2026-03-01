@@ -14,12 +14,12 @@ interface Project {
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
-  Building2: <Building2 className="w-6 h-6" />,
-  BarChart3:  <BarChart3 className="w-6 h-6" />,
-  Package:    <Package className="w-6 h-6" />,
-  Globe:      <Globe className="w-6 h-6" />,
-  Wallet:     <Wallet className="w-6 h-6" />,
-  Wrench:     <Wrench className="w-6 h-6" />,
+  Building2: <Building2 className="w-5 h-5" />,
+  BarChart3:  <BarChart3 className="w-5 h-5" />,
+  Package:    <Package className="w-5 h-5" />,
+  Globe:      <Globe className="w-5 h-5" />,
+  Wallet:     <Wallet className="w-5 h-5" />,
+  Wrench:     <Wrench className="w-5 h-5" />,
 };
 
 const FALLBACK: Project[] = [
@@ -109,6 +109,24 @@ const STATUS_STYLE: Record<string, string> = {
   'Pessoal':     'bg-purple-100 text-purple-700',
 };
 
+const CAT_BORDER: Record<string, string> = {
+  'Saúde':                'border-l-blue-500',
+  'Business Intelligence':'border-l-purple-500',
+  'Logística':            'border-l-orange-500',
+  'Web Institucional':    'border-l-cyan-500',
+  'Operações':            'border-l-green-500',
+  'Projeto Pessoal':      'border-l-pink-500',
+};
+
+const CAT_ICON_BG: Record<string, string> = {
+  'Saúde':                'bg-blue-100 text-blue-600',
+  'Business Intelligence':'bg-purple-100 text-purple-600',
+  'Logística':            'bg-orange-100 text-orange-600',
+  'Web Institucional':    'bg-cyan-100 text-cyan-600',
+  'Operações':            'bg-green-100 text-green-600',
+  'Projeto Pessoal':      'bg-pink-100 text-pink-600',
+};
+
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>(FALLBACK);
 
@@ -120,8 +138,10 @@ export default function ProjectsSection() {
   }, []);
 
   return (
-    <section id="projetos" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-6xl mx-auto">
+    <section id="projetos" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="max-w-3xl mx-auto">
+
+        {/* Header */}
         <ScrollReveal className="text-center mb-14">
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Portfólio
@@ -132,52 +152,61 @@ export default function ProjectsSection() {
           </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, index) => (
-            <ScrollReveal key={project.title} delay={Math.min(index * 0.08, 0.3)}>
-              <div className="flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 h-full">
-                {/* Header */}
-                <div className="p-6 border-b border-gray-100 bg-gradient-to-br from-slate-50 to-blue-50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-2.5 bg-blue-600 text-white rounded-lg">
-                      {ICON_MAP[project.icon] ?? <Briefcase className="w-6 h-6" />}
-                    </div>
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[project.status]}`}>
-                      {project.status}
-                    </span>
-                  </div>
-                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">{project.category}</p>
-                  <h3 className="text-lg font-bold text-gray-900 leading-snug mb-1">{project.title}</h3>
-                  <p className="text-xs text-gray-400 font-medium">{project.client}</p>
-                </div>
+        {/* List */}
+        <div className="space-y-4">
+          {projects.map((project, index) => {
+            const borderClass = CAT_BORDER[project.category] ?? 'border-l-gray-400';
+            const iconClass   = CAT_ICON_BG[project.category] ?? 'bg-gray-100 text-gray-600';
 
-                {/* Body */}
-                <div className="p-6 flex-1 flex flex-col gap-5">
-                  <p className="text-sm text-gray-600 leading-relaxed">{project.description}</p>
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Principais entregas</p>
-                    <ul className="space-y-1.5">
-                      {project.outcomes.map((o, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                          <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
-                          <span>{o}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="mt-auto pt-4 border-t border-gray-100">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.technologies.map((tech) => (
-                        <span key={tech} className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
-                          {tech}
-                        </span>
-                      ))}
+            return (
+              <ScrollReveal key={project.title} delay={Math.min(index * 0.07, 0.3)}>
+                <div className={`bg-white rounded-xl border-l-4 ${borderClass} border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-6`}>
+
+                  {/* Top row */}
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`p-2 rounded-lg shrink-0 ${iconClass}`}>
+                        {ICON_MAP[project.icon] ?? <Briefcase className="w-5 h-5" />}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-gray-900 leading-snug">{project.title}</h3>
+                        <p className="text-sm text-gray-400 mt-0.5">{project.client}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[project.status]}`}>
+                        {project.status}
+                      </span>
+                      <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{project.category}</span>
                     </div>
                   </div>
+
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 leading-relaxed mb-4">{project.description}</p>
+
+                  {/* Outcomes */}
+                  <ul className="space-y-1 mb-4">
+                    {project.outcomes.map((o, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
+                        <span>{o}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Technologies */}
+                  <div className="flex flex-wrap gap-1.5 pt-3 border-t border-gray-50">
+                    {project.technologies.map((tech) => (
+                      <span key={tech} className="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-md text-xs font-medium">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+
                 </div>
-              </div>
-            </ScrollReveal>
-          ))}
+              </ScrollReveal>
+            );
+          })}
         </div>
       </div>
     </section>
