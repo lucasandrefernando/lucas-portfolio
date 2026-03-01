@@ -96,106 +96,57 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Visual — Terminal Card */}
+          {/* Right Visual — Profile Photo */}
           <div className="hidden lg:flex items-center justify-center">
-            <div className="relative w-full">
-              {/* Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl opacity-15 blur-2xl scale-95 pointer-events-none" />
+            <div className="relative flex flex-col items-center">
+              {/* Background glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-10 blur-3xl scale-125 pointer-events-none" />
 
-              {/* Terminal */}
-              <div className="relative bg-gray-950 rounded-2xl shadow-2xl border border-gray-800 overflow-hidden">
-                {/* Window chrome */}
-                <div className="flex items-center gap-2 px-4 py-3 bg-gray-900 border-b border-gray-800">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="ml-3 text-xs text-gray-500 font-mono">portfolio.js</span>
+              {/* Photo with gradient ring */}
+              <div className="relative">
+                {/* Gradient ring */}
+                <div className="w-72 h-72 rounded-full p-[3px] bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 shadow-2xl">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gray-100">
+                    <img
+                      src="/foto.jpg"
+                      alt="Lucas André - Full Stack Developer"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
 
-                {/* Code body */}
-                <div className="p-6 font-mono text-sm space-y-1.5">
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">1</span>
-                    <div>
-                      <span className="text-purple-400">const </span>
-                      <span className="text-blue-300">dev</span>
-                      <span className="text-gray-400"> = </span>
-                      <span className="text-yellow-400">{'{'}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">2</span>
-                    <div className="ml-4">
-                      <span className="text-blue-300">name</span>
-                      <span className="text-gray-400">: </span>
-                      <span className="text-green-400">"Lucas André"</span>
-                      <span className="text-gray-400">,</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">3</span>
-                    <div className="ml-4">
-                      <span className="text-blue-300">stack</span>
-                      <span className="text-gray-400">: [</span>
-                      <span className="text-green-400">"PHP"</span>
-                      <span className="text-gray-400">, </span>
-                      <span className="text-green-400">"React"</span>
-                      <span className="text-gray-400">, </span>
-                      <span className="text-green-400">"Node"</span>
-                      <span className="text-gray-400">],</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">4</span>
-                    <div className="ml-4">
-                      <span className="text-blue-300">years</span>
-                      <span className="text-gray-400">: </span>
-                      <span className="text-orange-400">10</span>
-                      <span className="text-gray-500">, // experiência</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">5</span>
-                    <div className="ml-4">
-                      <span className="text-blue-300">ai</span>
-                      <span className="text-gray-400">: </span>
-                      <span className="text-purple-400">true</span>
-                      <span className="text-gray-400">,</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">6</span>
-                    <div>
-                      <span className="text-yellow-400">{'}'}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">7</span>
-                    <div className="text-transparent select-none">.</div>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="text-gray-700 select-none w-4 text-right shrink-0">8</span>
-                    <div>
-                      <span className="text-blue-300">dev</span>
-                      <span className="text-gray-400">.</span>
-                      <span className="text-yellow-300">solve</span>
-                      <span className="text-gray-400">(</span>
-                      <span className="text-orange-300">yourProblem</span>
-                      <span className="text-gray-400">)</span>
-                    </div>
-                  </div>
+                {/* Floating tech badges */}
+                <div className="absolute -top-4 -right-8 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                  PHP Sênior
+                </div>
+                <div className="absolute top-1/4 -left-14 bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />
+                  React
+                </div>
+                <div className="absolute top-3/4 -right-12 bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-green-500 rounded-full shrink-0" />
+                  Node.js
+                </div>
+                <div className="absolute -bottom-4 -left-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                  IA & Automação
+                </div>
+              </div>
 
-                  {/* Output */}
-                  <div className="mt-4 pt-4 border-t border-gray-800 space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span>
-                      <span className="text-green-400 text-xs">Solução entregue em produção</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-500">›</span>
-                      <span className="text-blue-400 text-xs">Sistema escalável · zero downtime</span>
-                    </div>
-                  </div>
+              {/* Experience strip */}
+              <div className="mt-10 bg-white rounded-2xl shadow-lg border border-gray-100 px-8 py-4 flex items-center gap-8">
+                <div className="text-center">
+                  <div className="text-2xl font-black text-gray-900">10<span className="text-blue-600">+</span></div>
+                  <div className="text-xs text-gray-500 font-medium">Anos de exp.</div>
+                </div>
+                <div className="w-px h-8 bg-gray-200" />
+                <div className="text-center">
+                  <div className="text-2xl font-black text-gray-900">50<span className="text-purple-600">+</span></div>
+                  <div className="text-xs text-gray-500 font-medium">Projetos</div>
+                </div>
+                <div className="w-px h-8 bg-gray-200" />
+                <div className="text-center">
+                  <div className="text-2xl font-black text-green-600">Full</div>
+                  <div className="text-xs text-gray-500 font-medium">Stack</div>
                 </div>
               </div>
             </div>
@@ -225,6 +176,7 @@ export default function HeroSection() {
             <p className="text-gray-500 text-sm font-medium">Stack Principal</p>
           </div>
         </div>
+
       </div>
     </section>
   );

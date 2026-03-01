@@ -52,8 +52,32 @@ export default function AboutSection() {
             </div>
           </div>
 
-          {/* Right Content - Timeline */}
+          {/* Right Content - Photo + Timeline */}
           <div className="space-y-8">
+            {/* Profile photo */}
+            <div className="flex items-center gap-5">
+              <div className="relative shrink-0">
+                <div className="w-24 h-24 rounded-full p-[2px] bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 shadow-lg">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gray-100">
+                    <img
+                      src="/foto.jpg"
+                      alt="Lucas André"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white" />
+                </span>
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 text-lg">Lucas André</p>
+                <p className="text-gray-500 text-sm">Full Stack Developer · Eagle Telecom</p>
+                <p className="text-green-600 text-xs font-medium mt-0.5">Disponível para projetos</p>
+              </div>
+            </div>
+
             <div className="relative">
               {/* Timeline Line */}
               <div className="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 to-purple-600" />
