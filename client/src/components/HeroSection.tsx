@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { ArrowRight, Github, Linkedin, Mail, MapPin } from 'lucide-react';
 
 export default function HeroSection() {
@@ -17,16 +18,26 @@ export default function HeroSection() {
           <div className="space-y-8">
 
             {/* Badge — pulsing green dot */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="inline-flex items-center gap-2.5 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm"
+            >
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
               </span>
               <span className="text-sm font-semibold text-gray-600">Disponível para novos projetos</span>
-            </div>
+            </motion.div>
 
             {/* Headline */}
-            <div className="space-y-3">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.1, ease: 'easeOut' }}
+              className="space-y-3"
+            >
               <p className="text-base font-medium text-gray-400 tracking-widest uppercase">
                 Olá, sou Lucas André —
               </p>
@@ -40,15 +51,25 @@ export default function HeroSection() {
                   que entrega resultado.
                 </span>
               </h1>
-            </div>
+            </motion.div>
 
-            <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+              className="text-lg text-gray-600 leading-relaxed max-w-lg"
+            >
               10+ anos transformando problemas reais em sistemas que escalam. PHP Sênior,
               React, Node.js — e IA integrada ao fluxo quando faz sentido.
-            </p>
+            </motion.p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
               <button
                 onClick={() => document.getElementById('contato')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:shadow-xl hover:shadow-blue-200 hover:scale-105 transition-all duration-300 font-semibold flex items-center justify-center gap-2"
@@ -61,10 +82,15 @@ export default function HeroSection() {
               >
                 Ver Projetos
               </button>
-            </div>
+            </motion.div>
 
             {/* Social + Location */}
-            <div className="flex items-center gap-5 pt-2">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
+              className="flex items-center gap-5 pt-2"
+            >
               <div className="flex gap-3">
                 <a
                   href="https://linkedin.com/in/lucas-andre-fernando"
@@ -93,11 +119,16 @@ export default function HeroSection() {
                 <MapPin size={14} />
                 <span>Belo Horizonte, MG</span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Visual — Profile Photo */}
-          <div className="hidden lg:flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+            className="hidden lg:flex items-center justify-center"
+          >
             <div className="relative flex flex-col items-center">
               {/* Background glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-10 blur-3xl scale-125 pointer-events-none" />
@@ -150,7 +181,7 @@ export default function HeroSection() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Stats */}

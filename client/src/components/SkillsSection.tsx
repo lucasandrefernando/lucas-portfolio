@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ScrollReveal from './ScrollReveal';
 import {
   Code2,
   Database,
@@ -163,7 +164,7 @@ export default function SkillsSection() {
   return (
     <section id="habilidades" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
+        <ScrollReveal className="text-center mb-12">
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Habilidades Técnicas
           </span>
@@ -173,9 +174,9 @@ export default function SkillsSection() {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Mais de 10 anos de experiência em desenvolvimento e infraestrutura, combinando expertise em backend robusto com inovação em frontend moderno.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="flex flex-wrap gap-3 justify-center mb-12">
+        <ScrollReveal delay={0.1} className="flex flex-wrap gap-3 justify-center mb-12">
           <button
             onClick={() => setSelectedCategory(null)}
             className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
@@ -199,12 +200,12 @@ export default function SkillsSection() {
               {category}
             </button>
           ))}
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSkills.map((skill) => (
+          {filteredSkills.map((skill, index) => (
+            <ScrollReveal key={skill.name} delay={Math.min(index * 0.06, 0.3)}>
             <div
-              key={skill.name}
               className={`p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-105 ${getCategoryBg(
                 skill.category
               )} ${getCategoryBorder(skill.category)}`}
@@ -243,6 +244,7 @@ export default function SkillsSection() {
                 </span>
               </div>
             </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, Linkedin, Github, MessageCircle, Send, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import ScrollReveal from './ScrollReveal';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
@@ -38,7 +39,7 @@ export default function ContactSection() {
   return (
     <section id="contato" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
+        <ScrollReveal className="text-center mb-12">
           <span className="inline-block px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold mb-4">
             Contato
           </span>
@@ -47,7 +48,7 @@ export default function ContactSection() {
             Seja um sistema do zero, uma automação ou integração com IA — estou disponível para
             discutir como posso ajudar.
           </p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Info */}
@@ -57,8 +58,9 @@ export default function ContactSection() {
               { icon: <Linkedin className="w-5 h-5 text-blue-400" />, label: 'LinkedIn', value: 'lucas-andre-fernando', href: 'https://linkedin.com/in/lucas-andre-fernando' },
               { icon: <Github className="w-5 h-5 text-blue-400" />, label: 'GitHub', value: 'lucasandrefernando', href: 'https://github.com/lucasandrefernando' },
               { icon: <MessageCircle className="w-5 h-5 text-blue-400" />, label: 'WhatsApp', value: '+55 (31) 99542-0887', href: 'https://wa.me/5531995420887' },
-            ].map(({ icon, label, value, href }) => (
-              <div key={label} className="flex items-center gap-4">
+            ].map(({ icon, label, value, href }, index) => (
+              <ScrollReveal key={label} direction="right" delay={index * 0.1}>
+              <div className="flex items-center gap-4">
                 <div className="p-3 bg-blue-500/20 rounded-lg shrink-0">{icon}</div>
                 <div>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{label}</p>
@@ -68,12 +70,13 @@ export default function ContactSection() {
                   </a>
                 </div>
               </div>
+              </ScrollReveal>
             ))}
 
-            <div className="pt-6 border-t border-gray-700">
+            <ScrollReveal delay={0.4} className="pt-6 border-t border-gray-700">
               <p className="text-gray-400 text-sm mb-1">Tempo de resposta médio</p>
               <p className="text-white font-semibold">Até 24 horas úteis</p>
-            </div>
+            </ScrollReveal>
           </div>
 
           {/* Form */}
@@ -90,6 +93,7 @@ export default function ContactSection() {
               </button>
             </div>
           ) : (
+            <ScrollReveal direction="left" delay={0.1}>
             <form onSubmit={handleSubmit} className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 space-y-5">
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold mb-2">Seu Nome</label>
@@ -125,6 +129,7 @@ export default function ContactSection() {
                 Você receberá uma confirmação automática no seu email.
               </p>
             </form>
+            </ScrollReveal>
           )}
         </div>
       </div>
