@@ -38,6 +38,7 @@ jobs:
       - name: Commit built files to main
         run: |
           cp dist/index.js ./index.js
+          rm -rf ./public
           cp -r dist/public ./public
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
