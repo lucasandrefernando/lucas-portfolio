@@ -111,27 +111,55 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 const CAT_GRADIENT: Record<string, string> = {
-  'Saúde':                'from-blue-600 to-blue-400',
-  'Business Intelligence':'from-purple-600 to-purple-400',
-  'Logística':            'from-orange-600 to-orange-400',
-  'Web Institucional':    'from-cyan-600 to-cyan-400',
-  'Operações':            'from-green-600 to-green-400',
-  'Projeto Pessoal':      'from-pink-600 to-pink-400',
+  'Saúde':                'from-blue-700 via-blue-500 to-cyan-400',
+  'Business Intelligence':'from-purple-700 via-purple-500 to-pink-400',
+  'Logística':            'from-orange-600 via-orange-500 to-yellow-400',
+  'Web Institucional':    'from-cyan-700 via-cyan-500 to-teal-400',
+  'Operações':            'from-green-700 via-green-500 to-emerald-400',
+  'Projeto Pessoal':      'from-pink-700 via-pink-500 to-rose-400',
 };
 
 const CAT_ACCENT: Record<string, string> = {
-  'Saúde':                'text-blue-600 bg-blue-50',
-  'Business Intelligence':'text-purple-600 bg-purple-50',
-  'Logística':            'text-orange-600 bg-orange-50',
-  'Web Institucional':    'text-cyan-600 bg-cyan-50',
-  'Operações':            'text-green-600 bg-green-50',
-  'Projeto Pessoal':      'text-pink-600 bg-pink-50',
+  'Saúde':                'text-blue-600 bg-blue-50 border border-blue-100',
+  'Business Intelligence':'text-purple-600 bg-purple-50 border border-purple-100',
+  'Logística':            'text-orange-600 bg-orange-50 border border-orange-100',
+  'Web Institucional':    'text-cyan-600 bg-cyan-50 border border-cyan-100',
+  'Operações':            'text-green-600 bg-green-50 border border-green-100',
+  'Projeto Pessoal':      'text-pink-600 bg-pink-50 border border-pink-100',
 };
 
-const variants = {
-  enter: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit:  (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0 }),
+const CAT_DOT: Record<string, string> = {
+  'Saúde':                'bg-blue-500',
+  'Business Intelligence':'bg-purple-500',
+  'Logística':            'bg-orange-500',
+  'Web Institucional':    'bg-cyan-500',
+  'Operações':            'bg-green-500',
+  'Projeto Pessoal':      'bg-pink-500',
+};
+
+// Card slide + scale
+const cardVariants = {
+  enter: (d: number) => ({ x: d > 0 ? 120 : -120, opacity: 0, scale: 0.96 }),
+  center: { x: 0, opacity: 1, scale: 1 },
+  exit:  (d: number) => ({ x: d > 0 ? -120 : 120, opacity: 0, scale: 0.96 }),
+};
+
+// Stagger container
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
+};
+
+// Each staggered child
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+};
+
+// Icon spring
+const iconVariants = {
+  hidden: { opacity: 0, scale: 0.5, rotate: -10 },
+  show:   { opacity: 1, scale: 1, rotate: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } },
 };
 
 export default function ProjectsSection() {
@@ -156,6 +184,7 @@ export default function ProjectsSection() {
   const p = projects[current];
   const gradient = CAT_GRADIENT[p.category] ?? CAT_GRADIENT['Saúde'];
   const accent   = CAT_ACCENT[p.category]   ?? CAT_ACCENT['Saúde'];
+  const dotColor = CAT_DOT[p.category]      ?? CAT_DOT['Saúde'];
 
   return (
     <section id="projetos" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
@@ -174,68 +203,111 @@ export default function ProjectsSection() {
 
         {/* Carousel */}
         <ScrollReveal delay={0.1}>
-          <div className="relative">
+          <div className="relative overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={current}
                 custom={direction}
-                variants={variants}
+                variants={cardVariants}
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.35, ease: 'easeInOut' }}
+                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
               >
-                <div className="grid grid-cols-1 lg:grid-cols-5 rounded-2xl overflow-hidden shadow-xl border border-gray-100 min-h-[380px]">
+                <div className="grid grid-cols-1 lg:grid-cols-5 rounded-2xl overflow-hidden shadow-2xl min-h-[400px]">
 
-                  {/* Left panel — gradient */}
-                  <div className={`lg:col-span-2 bg-gradient-to-br ${gradient} p-8 flex flex-col justify-between text-white`}>
-                    <div>
+                  {/* Left panel */}
+                  <div className={`lg:col-span-2 bg-gradient-to-br ${gradient} p-8 flex flex-col justify-between relative overflow-hidden`}>
+                    {/* Decorative circles */}
+                    <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/10 pointer-events-none" />
+                    <div className="absolute -bottom-16 -left-8 w-56 h-56 rounded-full bg-black/10 pointer-events-none" />
+
+                    <motion.div
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="show"
+                      className="relative z-10"
+                    >
+                      {/* Icon + status */}
                       <div className="flex items-center justify-between mb-6">
-                        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <motion.div variants={iconVariants} className="p-3 bg-white/20 rounded-xl backdrop-blur-sm text-white shadow-lg">
                           {ICON_MAP[p.icon] ?? <Briefcase className="w-6 h-6" />}
-                        </div>
-                        <span className={`text-xs font-bold px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm`}>
+                        </motion.div>
+                        <motion.span variants={itemVariants} className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/25 backdrop-blur-sm text-white">
                           {p.status}
-                        </span>
+                        </motion.span>
                       </div>
-                      <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">{p.category}</p>
-                      <h3 className="text-2xl font-bold leading-snug mb-3">{p.title}</h3>
-                      <p className="text-white/70 text-sm">{p.client}</p>
-                    </div>
+
+                      <motion.p variants={itemVariants} className="text-white/60 text-xs font-bold uppercase tracking-widest mb-2">
+                        {p.category}
+                      </motion.p>
+                      <motion.h3 variants={itemVariants} className="text-white text-2xl font-bold leading-snug mb-3">
+                        {p.title}
+                      </motion.h3>
+                      <motion.p variants={itemVariants} className="text-white/65 text-sm">
+                        {p.client}
+                      </motion.p>
+                    </motion.div>
 
                     {/* Counter */}
-                    <p className="text-white/50 text-sm font-medium mt-6">
-                      {current + 1} / {projects.length}
-                    </p>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.45 }}
+                      className="text-white/40 text-sm font-medium relative z-10 mt-6"
+                    >
+                      {current + 1} <span className="text-white/25">/</span> {projects.length}
+                    </motion.p>
                   </div>
 
-                  {/* Right panel — details */}
-                  <div className="lg:col-span-3 bg-white p-8 flex flex-col justify-between">
+                  {/* Right panel */}
+                  <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                    className="lg:col-span-3 bg-white p-8 flex flex-col justify-between"
+                  >
                     <div>
-                      <p className="text-gray-600 leading-relaxed mb-6">{p.description}</p>
+                      <motion.p variants={itemVariants} className="text-gray-600 leading-relaxed mb-6">
+                        {p.description}
+                      </motion.p>
 
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Principais entregas</p>
+                      <motion.p variants={itemVariants} className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                        Principais entregas
+                      </motion.p>
+
                       <ul className="space-y-2 mb-6">
                         {p.outcomes.map((o, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
-                            <span className="mt-0.5 shrink-0 text-blue-500">✓</span>
+                          <motion.li
+                            key={i}
+                            variants={itemVariants}
+                            className="flex items-start gap-2.5 text-sm text-gray-700"
+                          >
+                            <span className="mt-0.5 shrink-0 text-blue-500 font-bold">✓</span>
                             <span>{o}</span>
-                          </li>
+                          </motion.li>
                         ))}
                       </ul>
                     </div>
 
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Tecnologias</p>
-                      <div className="flex flex-wrap gap-2">
+                      <motion.p variants={itemVariants} className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                        Tecnologias
+                      </motion.p>
+                      <motion.div variants={containerVariants} className="flex flex-wrap gap-2">
                         {p.technologies.map((tech) => (
-                          <span key={tech} className={`px-3 py-1 rounded-md text-xs font-semibold ${accent}`}>
+                          <motion.span
+                            key={tech}
+                            variants={itemVariants}
+                            whileHover={{ scale: 1.08, y: -2 }}
+                            className={`px-3 py-1 rounded-md text-xs font-semibold cursor-default ${accent}`}
+                          >
                             {tech}
-                          </span>
+                          </motion.span>
                         ))}
-                      </div>
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
 
                 </div>
               </motion.div>
@@ -243,35 +315,42 @@ export default function ProjectsSection() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-6">
-              <button
+              <motion.button
                 onClick={prev}
-                className="p-2.5 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
+                className="p-3 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm"
                 aria-label="Projeto anterior"
               >
                 <ChevronLeft size={20} className="text-gray-600" />
-              </button>
+              </motion.button>
 
               {/* Dots */}
               <div className="flex gap-2 items-center">
-                {projects.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => go(i)}
-                    aria-label={`Projeto ${i + 1}`}
-                    className={`transition-all duration-300 rounded-full ${
-                      i === current ? 'w-6 h-2.5 bg-blue-600' : 'w-2.5 h-2.5 bg-gray-300 hover:bg-gray-400'
-                    }`}
-                  />
-                ))}
+                {projects.map((proj, i) => {
+                  const dc = CAT_DOT[proj.category] ?? 'bg-gray-400';
+                  return (
+                    <motion.button
+                      key={i}
+                      onClick={() => go(i)}
+                      animate={{ width: i === current ? 24 : 10, opacity: i === current ? 1 : 0.4 }}
+                      transition={{ duration: 0.3 }}
+                      aria-label={`Projeto ${i + 1}`}
+                      className={`h-2.5 rounded-full ${i === current ? dc : 'bg-gray-300'}`}
+                    />
+                  );
+                })}
               </div>
 
-              <button
+              <motion.button
                 onClick={next}
-                className="p-2.5 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
+                className="p-3 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm"
                 aria-label="Próximo projeto"
               >
                 <ChevronRight size={20} className="text-gray-600" />
-              </button>
+              </motion.button>
             </div>
           </div>
         </ScrollReveal>
