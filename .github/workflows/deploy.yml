@@ -35,6 +35,8 @@ jobs:
           server: ftp.anacron.com.br
           username: anacron
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
           local-dir: ./dist/
           server-dir: /apps_nodejs/portfolio/
           exclude: |
