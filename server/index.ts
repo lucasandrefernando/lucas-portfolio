@@ -76,6 +76,14 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });
+
+  // Graceful shutdown: fecha o servidor antes de sair para liberar a porta
+  // Necessário para o PM2 conseguir reiniciar sem EADDRINUSE
+  const shutdown = () => {
+    server.close(() => process.exit(0));
+  };
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
 
 startServer().catch(console.error);
