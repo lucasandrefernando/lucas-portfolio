@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'index.js'
+      - 'public/**'
   workflow_dispatch:
 
 permissions:
@@ -32,17 +35,15 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Push built files to production branch
+      - name: Commit built files to main
         run: |
-          cd dist
-          git init
+          cp dist/index.js ./index.js
+          cp -r dist/public ./public
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git add -A
-          git commit -m "deploy: $(date '+%Y-%m-%d %H:%M:%S') - ${{ github.sha }}"
-          git push --force \
-            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
-            HEAD:production
+          git add index.js public/
+          git diff --staged --quiet || git commit -m "chore: update built files [skip ci]"
+          git push
 
       - name: Deployment Summary
         if: always()
@@ -50,6 +51,6 @@ jobs:
           echo "## Deploy Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- **URL**: http://anacron.com.br:21017" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: production" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: main" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Time**: $(date)" >> $GITHUB_STEP_SUMMARY
