@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Building2, BarChart3, Package, Globe, Wallet, Wrench, Briefcase } from 'lucide-react';
+import { Building2, BarChart3, Package, Globe, Wallet, Wrench, Briefcase, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 interface Project {
@@ -14,12 +15,12 @@ interface Project {
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
-  Building2: <Building2 className="w-5 h-5" />,
-  BarChart3:  <BarChart3 className="w-5 h-5" />,
-  Package:    <Package className="w-5 h-5" />,
-  Globe:      <Globe className="w-5 h-5" />,
-  Wallet:     <Wallet className="w-5 h-5" />,
-  Wrench:     <Wrench className="w-5 h-5" />,
+  Building2: <Building2 className="w-6 h-6" />,
+  BarChart3:  <BarChart3 className="w-6 h-6" />,
+  Package:    <Package className="w-6 h-6" />,
+  Globe:      <Globe className="w-6 h-6" />,
+  Wallet:     <Wallet className="w-6 h-6" />,
+  Wrench:     <Wrench className="w-6 h-6" />,
 };
 
 const FALLBACK: Project[] = [
@@ -109,37 +110,56 @@ const STATUS_STYLE: Record<string, string> = {
   'Pessoal':     'bg-purple-100 text-purple-700',
 };
 
-const CAT_BORDER: Record<string, string> = {
-  'Saúde':                'border-l-blue-500',
-  'Business Intelligence':'border-l-purple-500',
-  'Logística':            'border-l-orange-500',
-  'Web Institucional':    'border-l-cyan-500',
-  'Operações':            'border-l-green-500',
-  'Projeto Pessoal':      'border-l-pink-500',
+const CAT_GRADIENT: Record<string, string> = {
+  'Saúde':                'from-blue-600 to-blue-400',
+  'Business Intelligence':'from-purple-600 to-purple-400',
+  'Logística':            'from-orange-600 to-orange-400',
+  'Web Institucional':    'from-cyan-600 to-cyan-400',
+  'Operações':            'from-green-600 to-green-400',
+  'Projeto Pessoal':      'from-pink-600 to-pink-400',
 };
 
-const CAT_ICON_BG: Record<string, string> = {
-  'Saúde':                'bg-blue-100 text-blue-600',
-  'Business Intelligence':'bg-purple-100 text-purple-600',
-  'Logística':            'bg-orange-100 text-orange-600',
-  'Web Institucional':    'bg-cyan-100 text-cyan-600',
-  'Operações':            'bg-green-100 text-green-600',
-  'Projeto Pessoal':      'bg-pink-100 text-pink-600',
+const CAT_ACCENT: Record<string, string> = {
+  'Saúde':                'text-blue-600 bg-blue-50',
+  'Business Intelligence':'text-purple-600 bg-purple-50',
+  'Logística':            'text-orange-600 bg-orange-50',
+  'Web Institucional':    'text-cyan-600 bg-cyan-50',
+  'Operações':            'text-green-600 bg-green-50',
+  'Projeto Pessoal':      'text-pink-600 bg-pink-50',
+};
+
+const variants = {
+  enter: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit:  (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0 }),
 };
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>(FALLBACK);
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     fetch('/api/portfolio/projects')
       .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data) && data.length > 0) setProjects(data); })
+      .then((data) => { if (Array.isArray(data) && data.length > 0) { setProjects(data); setCurrent(0); } })
       .catch(() => {});
   }, []);
 
+  const go = (index: number) => {
+    setDirection(index > current ? 1 : -1);
+    setCurrent(index);
+  };
+  const prev = () => go((current - 1 + projects.length) % projects.length);
+  const next = () => go((current + 1) % projects.length);
+
+  const p = projects[current];
+  const gradient = CAT_GRADIENT[p.category] ?? CAT_GRADIENT['Saúde'];
+  const accent   = CAT_ACCENT[p.category]   ?? CAT_ACCENT['Saúde'];
+
   return (
-    <section id="projetos" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="max-w-3xl mx-auto">
+    <section id="projetos" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <div className="max-w-6xl mx-auto">
 
         {/* Header */}
         <ScrollReveal className="text-center mb-14">
@@ -152,62 +172,109 @@ export default function ProjectsSection() {
           </p>
         </ScrollReveal>
 
-        {/* List */}
-        <div className="space-y-4">
-          {projects.map((project, index) => {
-            const borderClass = CAT_BORDER[project.category] ?? 'border-l-gray-400';
-            const iconClass   = CAT_ICON_BG[project.category] ?? 'bg-gray-100 text-gray-600';
+        {/* Carousel */}
+        <ScrollReveal delay={0.1}>
+          <div className="relative">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={current}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-5 rounded-2xl overflow-hidden shadow-xl border border-gray-100 min-h-[380px]">
 
-            return (
-              <ScrollReveal key={project.title} delay={Math.min(index * 0.07, 0.3)}>
-                <div className={`bg-white rounded-xl border-l-4 ${borderClass} border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-6`}>
+                  {/* Left panel — gradient */}
+                  <div className={`lg:col-span-2 bg-gradient-to-br ${gradient} p-8 flex flex-col justify-between text-white`}>
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                          {ICON_MAP[p.icon] ?? <Briefcase className="w-6 h-6" />}
+                        </div>
+                        <span className={`text-xs font-bold px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm`}>
+                          {p.status}
+                        </span>
+                      </div>
+                      <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2">{p.category}</p>
+                      <h3 className="text-2xl font-bold leading-snug mb-3">{p.title}</h3>
+                      <p className="text-white/70 text-sm">{p.client}</p>
+                    </div>
 
-                  {/* Top row */}
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-2 rounded-lg shrink-0 ${iconClass}`}>
-                        {ICON_MAP[project.icon] ?? <Briefcase className="w-5 h-5" />}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="font-bold text-gray-900 leading-snug">{project.title}</h3>
-                        <p className="text-sm text-gray-400 mt-0.5">{project.client}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5 shrink-0">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[project.status]}`}>
-                        {project.status}
-                      </span>
-                      <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{project.category}</span>
-                    </div>
+                    {/* Counter */}
+                    <p className="text-white/50 text-sm font-medium mt-6">
+                      {current + 1} / {projects.length}
+                    </p>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">{project.description}</p>
+                  {/* Right panel — details */}
+                  <div className="lg:col-span-3 bg-white p-8 flex flex-col justify-between">
+                    <div>
+                      <p className="text-gray-600 leading-relaxed mb-6">{p.description}</p>
 
-                  {/* Outcomes */}
-                  <ul className="space-y-1 mb-4">
-                    {project.outcomes.map((o, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                        <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
-                        <span>{o}</span>
-                      </li>
-                    ))}
-                  </ul>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Principais entregas</p>
+                      <ul className="space-y-2 mb-6">
+                        {p.outcomes.map((o, i) => (
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
+                            <span className="mt-0.5 shrink-0 text-blue-500">✓</span>
+                            <span>{o}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                  {/* Technologies */}
-                  <div className="flex flex-wrap gap-1.5 pt-3 border-t border-gray-50">
-                    {project.technologies.map((tech) => (
-                      <span key={tech} className="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-md text-xs font-medium">
-                        {tech}
-                      </span>
-                    ))}
+                    <div>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Tecnologias</p>
+                      <div className="flex flex-wrap gap-2">
+                        {p.technologies.map((tech) => (
+                          <span key={tech} className={`px-3 py-1 rounded-md text-xs font-semibold ${accent}`}>
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                 </div>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between mt-6">
+              <button
+                onClick={prev}
+                className="p-2.5 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm"
+                aria-label="Projeto anterior"
+              >
+                <ChevronLeft size={20} className="text-gray-600" />
+              </button>
+
+              {/* Dots */}
+              <div className="flex gap-2 items-center">
+                {projects.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => go(i)}
+                    aria-label={`Projeto ${i + 1}`}
+                    className={`transition-all duration-300 rounded-full ${
+                      i === current ? 'w-6 h-2.5 bg-blue-600' : 'w-2.5 h-2.5 bg-gray-300 hover:bg-gray-400'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={next}
+                className="p-2.5 rounded-full border border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm"
+                aria-label="Próximo projeto"
+              >
+                <ChevronRight size={20} className="text-gray-600" />
+              </button>
+            </div>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
