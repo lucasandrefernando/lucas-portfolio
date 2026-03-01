@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Quote } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
@@ -35,26 +35,46 @@ function TestimonialCard({ t }: { t: Testimonial }) {
 
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: '0 20px 40px -12px rgba(37,99,235,0.15)' }}
+      whileHover={{ y: -6, scale: 1.03 }}
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-      className="w-80 shrink-0 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col gap-4 cursor-default select-none"
+      className="w-80 shrink-0 rounded-2xl p-6 flex flex-col gap-5 cursor-default select-none relative overflow-hidden"
+      style={{
+        background: 'rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+      }}
     >
+      {/* Subtle inner glow top */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
       {/* Quote icon */}
-      <Quote className="w-8 h-8 text-blue-100" />
+      <Quote className="w-9 h-9 text-blue-400/60" />
 
       {/* Text */}
-      <p className="text-gray-600 text-sm leading-relaxed flex-1">
+      <p className="text-white/80 text-sm leading-relaxed flex-1">
         "{t.text}"
       </p>
 
       {/* Author */}
-      <div className="flex items-center gap-3 pt-2 border-t border-gray-50">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-          {initials}
+      <div className="flex items-center gap-3 pt-3 border-t border-white/10">
+        {/* Avatar with pulse ring */}
+        <div className="relative shrink-0">
+          {/* Pulse ring */}
+          <motion.div
+            animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute inset-0 rounded-full bg-blue-400/40"
+          />
+          <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm ring-2 ring-white/20 z-10">
+            {initials}
+          </div>
         </div>
+
         <div>
-          <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-          <p className="text-gray-400 text-xs">{t.role} · {t.company}</p>
+          <p className="font-semibold text-white text-sm">{t.name}</p>
+          <p className="text-white/50 text-xs">{t.role} · {t.company}</p>
         </div>
       </div>
     </motion.div>
@@ -64,7 +84,6 @@ function TestimonialCard({ t }: { t: Testimonial }) {
 export default function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(FALLBACK);
   const controls = useAnimationControls();
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/portfolio/testimonials')
@@ -73,57 +92,67 @@ export default function TestimonialsSection() {
       .catch(() => {});
   }, []);
 
-  // Start infinite marquee
-  useEffect(() => {
+  const startMarquee = () =>
     controls.start({
       x: ['0%', '-50%'],
-      transition: { duration: 28, ease: 'linear', repeat: Infinity },
+      transition: { duration: 30, ease: 'linear', repeat: Infinity },
     });
-  }, [testimonials, controls]);
+
+  useEffect(() => { startMarquee(); }, [testimonials]);
 
   const pause  = () => controls.stop();
-  const resume = () => controls.start({
-    x: ['0%', '-50%'],
-    transition: { duration: 28, ease: 'linear', repeat: Infinity },
-  });
+  const resume = () => startMarquee();
 
-  // Duplicate for seamless loop
   const doubled = [...testimonials, ...testimonials];
 
   return (
-    <section id="depoimentos" className="py-20 bg-gray-50 overflow-hidden">
+    <section
+      id="depoimentos"
+      className="py-20 overflow-hidden relative"
+      style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)' }}
+    >
+      {/* Background glow orbs */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
 
       {/* Header */}
       <ScrollReveal>
-        <div className="text-center space-y-4 mb-14 px-4">
-          <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+        <div className="text-center space-y-4 mb-14 px-4 relative z-10">
+          <span className="inline-block px-4 py-2 bg-white/10 text-blue-300 rounded-full text-sm font-semibold border border-white/10">
             Depoimentos
           </span>
-          <h2 className="text-4xl font-bold text-gray-900">
+          <h2 className="text-4xl font-bold text-white">
             O que dizem sobre{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               meu trabalho
             </span>
           </h2>
-          <p className="text-gray-400 text-sm">Passe o mouse para pausar</p>
+          <p className="text-white/30 text-sm">Passe o mouse para pausar</p>
         </div>
       </ScrollReveal>
 
       {/* Marquee */}
       <ScrollReveal delay={0.1}>
-        {/* Fade edges */}
         <div
           className="relative"
           onMouseEnter={pause}
           onMouseLeave={resume}
         >
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-gray-50 to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-gray-50 to-transparent" />
+          {/* Left fade */}
+          <div
+            className="pointer-events-none absolute left-0 top-0 bottom-0 w-32 z-10"
+            style={{ background: 'linear-gradient(to right, #0f172a, transparent)' }}
+          />
+          {/* Right fade */}
+          <div
+            className="pointer-events-none absolute right-0 top-0 bottom-0 w-32 z-10"
+            style={{ background: 'linear-gradient(to left, #0f172a, transparent)' }}
+          />
 
-          <div ref={containerRef} className="overflow-hidden py-4">
+          <div className="overflow-hidden py-6 px-4">
             <motion.div
               animate={controls}
-              className="flex gap-6"
+              className="flex gap-5"
               style={{ width: 'max-content' }}
             >
               {doubled.map((t, i) => (
