@@ -1,5 +1,6 @@
 import express from "express";
 import { createServer } from "http";
+import { exec } from "child_process";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -19,6 +20,46 @@ async function startServer() {
   const staticPath = fs.existsSync(path.join(productionPath, "index.html"))
     ? productionPath
     : devPath;
+
+  // ── Deploy webhook ───────────────────────────────────────────────────────
+  // GitHub Actions envia os arquivos buildados como tar.gz via POST HTTP.
+  // Isso evita dependencia de SSH/FTP que sao bloqueados por IP no KingHost.
+  app.post("/api/deploy", (req, res) => {
+    const token = req.headers["x-deploy-token"];
+    const deployToken = process.env.DEPLOY_TOKEN;
+
+    if (!deployToken) {
+      return res.status(503).json({ error: "DEPLOY_TOKEN not configured on server" });
+    }
+    if (token !== deployToken) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const tmpFile = `/tmp/deploy-${Date.now()}.tar.gz`;
+    const writeStream = fs.createWriteStream(tmpFile);
+
+    req.pipe(writeStream);
+
+    writeStream.on("finish", () => {
+      // Responde antes de extrair para nao ser cortado pelo restart do PM2
+      res.json({ success: true, message: "Deploy recebido, extraindo arquivos..." });
+
+      exec(`tar -xzf ${tmpFile} -C ${__dirname}`, (err, _stdout, stderr) => {
+        fs.unlink(tmpFile, () => {});
+        if (err) {
+          console.error("[deploy] Erro ao extrair:", stderr);
+        } else {
+          console.log("[deploy] Arquivos atualizados - PM2 vai reiniciar automaticamente");
+        }
+      });
+    });
+
+    writeStream.on("error", (err) => {
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+  });
 
   app.use(express.static(staticPath));
 

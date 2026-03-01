@@ -28,24 +28,18 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Upload files via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          source: "dist/index.js,dist/public"
-          target: "/home/anacron/apps_nodejs/portfolio"
-          strip_components: 1
+      - name: Create deployment archive
+        run: tar -czf deploy.tar.gz -C dist .
 
-      - name: Restart PM2
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          script: |
-            pm2 restart portfolio 2>/dev/null || \
-            pm2 start /home/anacron/apps_nodejs/portfolio/index.js --name portfolio
+      - name: Send to server via webhook
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+        run: |
+          curl -X POST "${SERVER_URL}/api/deploy" \
+            -H "x-deploy-token: ${DEPLOY_TOKEN}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @deploy.tar.gz \
+            --fail \
+            --max-time 120
+          echo "Deploy enviado com sucesso!"
