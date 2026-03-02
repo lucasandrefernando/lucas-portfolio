@@ -99,7 +99,7 @@ export default function ContactSection() {
           <span className="inline-block px-4 py-2 bg-white/10 text-blue-300 rounded-full text-sm font-semibold border border-white/10 mb-4">
             Contato
           </span>
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Tem um Problema para{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Resolver?
@@ -116,7 +116,7 @@ export default function ContactSection() {
           {/* ── LEFT: Contact hub card ── */}
           <ScrollReveal direction="right">
             <div
-              className="rounded-2xl p-8 border border-white/[0.08] relative overflow-hidden flex flex-col h-full"
+              className="rounded-2xl p-5 sm:p-8 border border-white/[0.08] relative overflow-hidden flex flex-col h-full"
               style={{ background: 'rgba(255,255,255,0.04)' }}
             >
               {/* Decorative glows */}
@@ -223,11 +223,11 @@ export default function ContactSection() {
                 <ScrollReveal direction="left" delay={0.1}>
                   <form
                     onSubmit={handleSubmit}
-                    className="rounded-2xl px-8 py-10 border border-white/[0.08] space-y-8"
+                    className="rounded-2xl px-5 sm:px-8 py-8 sm:py-10 border border-white/[0.08] space-y-6 sm:space-y-8"
                     style={{ background: 'rgba(255,255,255,0.04)' }}
                   >
                     {/* Name + Email side by side */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
                       <Field id="name"  label="Seu nome"   value={formData.name}  onChange={handleChange} />
                       <Field id="email" label="Seu email"  type="email" value={formData.email} onChange={handleChange} />
                     </div>

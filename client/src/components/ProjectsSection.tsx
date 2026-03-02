@@ -184,7 +184,7 @@ export default function ProjectsSection() {
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Portfólio
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
             Sistemas em{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Uso Real
@@ -240,7 +240,7 @@ export default function ProjectsSection() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3, delay: 0.2 }}
-                        className={`flex-1 bg-gradient-to-br ${gradient} p-8 flex flex-col relative overflow-hidden`}
+                        className={`flex-1 bg-gradient-to-br ${gradient} p-5 sm:p-8 flex flex-col relative overflow-hidden`}
                       >
                         {/* Decorative orbs */}
                         <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 pointer-events-none" />
@@ -257,7 +257,7 @@ export default function ProjectsSection() {
                           </div>
 
                           <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-1">{p.category}</p>
-                          <h3 className="text-white text-2xl font-bold leading-snug mb-1">{p.title}</h3>
+                          <h3 className="text-white text-xl sm:text-2xl font-bold leading-snug mb-1">{p.title}</h3>
                           <p className="text-white/60 text-sm mb-4">{p.client}</p>
                           <p className="text-white/80 text-sm leading-relaxed mb-5">{p.description}</p>
 

@@ -13,10 +13,10 @@ export default function HeroSection() {
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-300 rounded-full opacity-10 blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center min-h-[520px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[520px]">
 
           {/* Left Content */}
-          <div className="space-y-8">
+          <div className="space-y-5 sm:space-y-8">
 
             {/* Badge — pulsing green dot */}
             <motion.div
@@ -42,13 +42,13 @@ export default function HeroSection() {
               <p className="text-base font-medium text-gray-400 tracking-widest uppercase">
                 Olá, sou Lucas André —
               </p>
-              <h1 className="text-5xl lg:text-6xl font-black text-gray-900 leading-[1.05]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.05]">
                 Full Stack{' '}
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Developer
                 </span>
                 <br />
-                <span className="text-4xl lg:text-5xl font-bold text-gray-600">
+                <span className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-600">
                   que entrega resultado.
                 </span>
               </h1>
@@ -186,26 +186,26 @@ export default function HeroSection() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-6 mt-16 pt-12 border-t border-gray-200">
+        <div className="grid grid-cols-3 gap-2 sm:gap-6 mt-10 sm:mt-16 pt-12 border-t border-gray-200">
           <div className="text-center group cursor-default">
-            <div className="text-4xl font-black text-gray-900 mb-1">
+            <div className="text-2xl sm:text-4xl font-black text-gray-900 mb-1">
               <CountUp end={10} /><span className="text-blue-600">+</span>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Anos de Experiência</p>
+            <p className="text-gray-500 text-xs sm:text-sm font-medium">Anos de Experiência</p>
           </div>
           <div className="text-center group cursor-default">
-            <div className="text-4xl font-black text-gray-900 mb-1">
+            <div className="text-2xl sm:text-4xl font-black text-gray-900 mb-1">
               <CountUp end={50} /><span className="text-purple-600">+</span>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Projetos Entregues</p>
+            <p className="text-gray-500 text-xs sm:text-sm font-medium">Projetos Entregues</p>
           </div>
           <div className="text-center group cursor-default">
-            <div className="text-4xl font-black text-gray-900 mb-1">
+            <div className="text-2xl sm:text-4xl font-black text-gray-900 mb-1">
               <span className="text-pink-600">PHP</span>
-              <span className="text-gray-400 text-2xl"> + </span>
+              <span className="text-gray-400 text-lg sm:text-2xl"> + </span>
               <span className="text-blue-500">React</span>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Stack Principal</p>
+            <p className="text-gray-500 text-xs sm:text-sm font-medium">Stack Principal</p>
           </div>
         </div>
 

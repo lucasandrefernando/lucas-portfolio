@@ -74,7 +74,7 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-10">
 
           {/* Navigation */}
-          <nav className="flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-2">
+          <nav className="flex flex-wrap justify-center sm:justify-start gap-x-4 sm:gap-x-6 gap-y-2">
             {NAV.map(({ label, id }) => (
               <button
                 key={id}

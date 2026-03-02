@@ -122,14 +122,14 @@ export default function TestimonialsSection() {
       </ScrollReveal>
 
       {/* ── Carousel ── */}
-      <div className="relative max-w-6xl mx-auto px-20 sm:px-28">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-20 lg:px-28">
 
         {/*
           h-[430px] is enough headroom for the expanded center card
           (compact ≈ 310px, expanded ≈ 380px). Absolute cards don't
           affect section height so overflow is visible inside the section.
         */}
-        <div className="relative h-[430px] flex items-center justify-center">
+        <div className="relative min-h-[300px] sm:h-[430px] flex items-center justify-center">
           {testimonials.map((t, i) => {
             const len = testimonials.length;
             let offset = i - current;
@@ -262,7 +262,7 @@ export default function TestimonialsSection() {
         <motion.button
           onClick={prev}
           whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.9 }}
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-900/60 z-40 transition-colors"
+          className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 items-center justify-center shadow-lg shadow-blue-900/60 z-40 transition-colors"
         >
           <ChevronLeft size={22} className="text-white" />
         </motion.button>
@@ -270,7 +270,7 @@ export default function TestimonialsSection() {
         <motion.button
           onClick={next}
           whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.9 }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-900/60 z-40 transition-colors"
+          className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 items-center justify-center shadow-lg shadow-blue-900/60 z-40 transition-colors"
         >
           <ChevronRight size={22} className="text-white" />
         </motion.button>

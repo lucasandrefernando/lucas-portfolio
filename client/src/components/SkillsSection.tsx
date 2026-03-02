@@ -393,7 +393,7 @@ export default function SkillsSection() {
           <span className="inline-block px-4 py-2 bg-white/10 text-blue-300 rounded-full text-sm font-semibold border border-white/10 mb-4">
             Stack Técnico
           </span>
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4">
             Expertise{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Consolidada
@@ -406,7 +406,7 @@ export default function SkillsSection() {
 
         {/* Stats strip */}
         <ScrollReveal delay={0.05}>
-          <div className="flex flex-wrap justify-center gap-8 mb-10 mt-6">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mb-10 mt-6">
             {[
               { value: skills.length,     label: 'tecnologias'  },
               { value: CATEGORIES.length, label: 'áreas'        },
@@ -450,7 +450,7 @@ export default function SkillsSection() {
 
         {/* Legend */}
         <ScrollReveal delay={0.2}>
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs text-white/40">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-8 text-xs text-white/40">
             <span className="uppercase tracking-widest">Nível de proficiência:</span>
             {[
               { label: 'Sênior', dots: 3 },
