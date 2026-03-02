@@ -55437,7 +55437,7 @@ Diretrizes:
     const db = getDB();
     if (!db) return res.status(503).json({ error: "DB not configured" });
     try {
-      const [rows] = await db.query("SELECT name, level, proficiency, category FROM skills WHERE active=1 ORDER BY sort_order");
+      const [rows] = await db.query("SELECT name, level, proficiency, category, IFNULL(description,'') as description FROM skills WHERE active=1 ORDER BY sort_order");
       res.json(rows);
     } catch (err) {
       console.error("[db/skills]", err);
