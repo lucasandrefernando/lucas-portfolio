@@ -23,8 +23,8 @@ function App() {
           <AboutSection />
           <SkillsSection />
           <ExperienceSection />
-          <ProjectsSection />
           <TestimonialsSection />
+          <ProjectsSection />
           <ContactSection />
           <Footer />
           <ChatWidget />

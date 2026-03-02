@@ -14,24 +14,28 @@ export default function AboutSection() {
   return (
     <section id="sobre" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        {/* ── Centered header ── */}
+        <ScrollReveal className="text-center mb-12">
+          <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+            Sobre Mim
+          </span>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Mais que um desenvolvedor, um{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              arquiteto de soluções
+            </span>
+          </h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            Da infraestrutura ao full stack — cada etapa construiu uma camada de profundidade técnica que poucos desenvolvedores têm.
+          </p>
+        </ScrollReveal>
+
+        {/* ── Two-column content ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left Content */}
           <div className="space-y-8">
             <ScrollReveal direction="right">
-              <div className="space-y-4">
-                <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                  Sobre Mim
-                </span>
-                <h2 className="text-4xl font-bold text-gray-900">
-                  Mais que um desenvolvedor, um{' '}
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    arquiteto de soluções
-                  </span>
-                </h2>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.1}>
               <p className="text-lg text-gray-600 leading-relaxed">
                 Comecei em infraestrutura de TI — redes, servidores, segurança. Essa base me deu algo
                 raro no desenvolvimento: visão sistêmica completa. Hoje escrevo código sabendo exatamente
@@ -39,7 +43,7 @@ export default function AboutSection() {
               </p>
             </ScrollReveal>
 
-            <ScrollReveal delay={0.15}>
+            <ScrollReveal delay={0.1}>
               <p className="text-lg text-gray-600 leading-relaxed">
                 Na <strong>Eagle Telecom</strong>, desenvolvo sistemas críticos do zero à produção.
                 Meu diferencial real: uso <strong>Inteligência Artificial</strong> como ferramenta de

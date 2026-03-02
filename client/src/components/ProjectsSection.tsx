@@ -149,8 +149,9 @@ export default function ProjectsSection() {
       .catch(() => {});
   }, []);
 
+  const stopTimer  = () => { if (timerRef.current) clearInterval(timerRef.current); };
   const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    stopTimer();
     timerRef.current = setInterval(() => {
       setFeatured((f) => (f + 1) % projects.length);
     }, 4500);
@@ -183,7 +184,12 @@ export default function ProjectsSection() {
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Portfólio
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Sistemas em Uso Real</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Sistemas em{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Uso Real
+            </span>
+          </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">
             Projetos desenvolvidos para resolver problemas reais em empresas reais — do levantamento de requisitos ao deploy em produção.
           </p>
@@ -201,7 +207,11 @@ export default function ProjectsSection() {
             └─────────┴────────────┴──────────────┘
             Each non-featured card is clickable → becomes featured.
           */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-[260px_260px_260px] gap-4">
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-[260px_260px_260px] gap-4"
+            onMouseEnter={stopTimer}
+            onMouseLeave={startTimer}
+          >
             {ordered.slice(0, 6).map((p, i) => {
               const isLarge  = i === 0;
               const gradient = CAT_GRADIENT[p.category] ?? CAT_GRADIENT['Saúde'];

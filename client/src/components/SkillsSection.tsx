@@ -32,13 +32,13 @@ const FALLBACK: Skill[] = [
 const CATEGORIES = ['Backend', 'Frontend', 'Database', 'Tools', 'AI/Automation'] as const;
 
 const CAT_CONFIG: Record<string, {
-  color: string; lightBg: string; textColor: string; iconBg: string;
+  color: string;
 }> = {
-  Backend:         { color: '#3b82f6', lightBg: '#eff6ff', textColor: '#1d4ed8', iconBg: '#dbeafe' },
-  Frontend:        { color: '#8b5cf6', lightBg: '#f5f3ff', textColor: '#6d28d9', iconBg: '#ede9fe' },
-  Database:        { color: '#10b981', lightBg: '#ecfdf5', textColor: '#047857', iconBg: '#d1fae5' },
-  Tools:           { color: '#f59e0b', lightBg: '#fffbeb', textColor: '#b45309', iconBg: '#fde68a' },
-  'AI/Automation': { color: '#ec4899', lightBg: '#fdf2f8', textColor: '#be185d', iconBg: '#fce7f3' },
+  Backend:         { color: '#60a5fa' },
+  Frontend:        { color: '#a78bfa' },
+  Database:        { color: '#34d399' },
+  Tools:           { color: '#fbbf24' },
+  'AI/Automation': { color: '#f472b6' },
 };
 
 const CAT_ICON: Record<string, React.ReactNode> = {
@@ -76,7 +76,7 @@ function SkillBar({
   const inView = useInView(ref, { once: true, margin: '-40px' });
 
   return (
-    <div ref={ref} className="flex-1 h-[5px] bg-gray-100 rounded-full overflow-visible relative">
+    <div ref={ref} className="flex-1 h-[5px] bg-white/10 rounded-full overflow-visible relative">
       <motion.div
         className="h-full rounded-full relative"
         style={{ backgroundColor: color }}
@@ -105,35 +105,36 @@ function CategoryGroup({
 
   return (
     <motion.div
-      whileHover={{ y: -2, boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}
+      whileHover={{ y: -2, boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
       transition={{ duration: 0.2 }}
-      className="rounded-2xl border border-gray-200 bg-white overflow-hidden"
+      className="rounded-2xl border border-white/[0.08] overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.04)' }}
     >
       {/* ─ Category header ─ */}
       <div
         className="flex items-center gap-3 px-5 py-4"
-        style={{ backgroundColor: cfg.lightBg, borderLeft: `4px solid ${cfg.color}` }}
+        style={{ backgroundColor: `${cfg.color}18`, borderLeft: `4px solid ${cfg.color}` }}
       >
         {/* Icon chip */}
         <div
           className="p-2 rounded-lg shrink-0"
-          style={{ backgroundColor: cfg.iconBg, color: cfg.color }}
+          style={{ backgroundColor: `${cfg.color}25`, color: cfg.color }}
         >
           {CAT_ICON[category]}
         </div>
 
         {/* Category name + skill count */}
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-sm" style={{ color: cfg.textColor }}>{category}</p>
-          <p className="text-xs text-gray-400">{skills.length} habilidades</p>
+          <p className="font-bold text-sm" style={{ color: cfg.color }}>{category}</p>
+          <p className="text-xs text-white/35">{skills.length} habilidades</p>
         </div>
 
-        {/* Average proficiency gauge (mini arc) */}
+        {/* Average proficiency */}
         <div className="flex flex-col items-center shrink-0">
           <span className="text-lg font-bold leading-none" style={{ color: cfg.color }}>
             {avg}%
           </span>
-          <span className="text-[10px] text-gray-400 mt-0.5">média</span>
+          <span className="text-[10px] text-white/35 mt-0.5">média</span>
         </div>
       </div>
 
@@ -146,15 +147,15 @@ function CategoryGroup({
           return (
             <div
               key={skill.name}
-              className="group flex items-center gap-3 px-5 py-3 border-t border-gray-50 hover:bg-gray-50/70 transition-colors duration-150"
+              className="group flex items-center gap-3 px-5 py-3 border-t border-white/[0.06] hover:bg-white/[0.04] transition-colors duration-150"
             >
               {/* Skill icon */}
-              <span className="text-gray-300 group-hover:text-gray-400 transition-colors shrink-0">
+              <span className="text-white/25 group-hover:text-white/50 transition-colors shrink-0">
                 {icon}
               </span>
 
               {/* Skill name */}
-              <span className="text-sm font-medium text-gray-800 w-[120px] shrink-0 truncate">
+              <span className="text-sm font-medium text-white/80 shrink-0">
                 {skill.name}
               </span>
 
@@ -162,7 +163,7 @@ function CategoryGroup({
               <SkillBar value={skill.proficiency} color={cfg.color} delay={0.15 + i * 0.09} />
 
               {/* Percentage */}
-              <span className="text-xs font-bold text-gray-500 w-8 text-right shrink-0">
+              <span className="text-xs font-bold text-white/40 w-8 text-right shrink-0">
                 {skill.proficiency}%
               </span>
 
@@ -174,7 +175,7 @@ function CategoryGroup({
                     className="w-1.5 h-1.5 rounded-full transition-opacity"
                     style={{
                       backgroundColor: cfg.color,
-                      opacity: n <= dots ? 1 : 0.18,
+                      opacity: n <= dots ? 1 : 0.15,
                     }}
                   />
                 ))}
@@ -207,21 +208,21 @@ export default function SkillsSection() {
   const seniorCount = skills.filter((s) => s.level === 'Sênior').length;
 
   return (
-    <section id="habilidades" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <section id="habilidades" className="py-20 px-4 sm:px-6 lg:px-8" style={{ background: '#0f172a' }}>
       <div className="max-w-6xl mx-auto">
 
         {/* ── Header ── */}
         <ScrollReveal className="text-center mb-4">
-          <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-2 bg-white/10 text-blue-300 rounded-full text-sm font-semibold border border-white/10 mb-4">
             Stack Técnico
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             Expertise{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Consolidada
             </span>
           </h2>
-          <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+          <p className="text-white/50 text-lg max-w-2xl mx-auto">
             Mais de 10 anos combinando desenvolvimento robusto com visão de infraestrutura.
           </p>
         </ScrollReveal>
@@ -236,8 +237,8 @@ export default function SkillsSection() {
               { value: '10+',             label: 'anos de exp.' },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-2xl font-extrabold text-gray-900">{s.value}</p>
-                <p className="text-xs text-gray-400 uppercase tracking-widest mt-0.5">{s.label}</p>
+                <p className="text-2xl font-extrabold text-white">{s.value}</p>
+                <p className="text-xs text-white/35 uppercase tracking-widest mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -265,7 +266,7 @@ export default function SkillsSection() {
 
         {/* ── Legend ── */}
         <ScrollReveal delay={0.2}>
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs text-gray-400">
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs text-white/40">
             <span className="uppercase tracking-widest">Nível de proficiência:</span>
             {[
               { label: 'Sênior', dots: 3 },
@@ -277,7 +278,7 @@ export default function SkillsSection() {
                   {[1, 2, 3].map((n) => (
                     <span
                       key={n}
-                      className="w-1.5 h-1.5 rounded-full bg-gray-400"
+                      className="w-1.5 h-1.5 rounded-full bg-white/40"
                       style={{ opacity: n <= l.dots ? 1 : 0.2 }}
                     />
                   ))}

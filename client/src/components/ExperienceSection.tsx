@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GraduationCap, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 interface Experience {
@@ -59,7 +60,7 @@ const FALLBACK_EXPERIENCES: Experience[] = [
     technologies: ['Power BI', 'Excel Avançado', 'SQL', 'Data Analysis'],
   },
   {
-    company: 'Decminas Distribuição e Logística',
+    company: 'Decminas',
     position: 'Analista de Infraestrutura de TI',
     period: 'Mar 2020 — Mai 2021',
     description: 'Gestão completa da infraestrutura de TI: redes, servidores, segurança e monitoramento. Base técnica que até hoje informa minha abordagem como desenvolvedor.',
@@ -81,9 +82,17 @@ const FALLBACK_EDUCATION: EducationItem[] = [
   { type: 'certification', title: 'Programação de Soluções Computacionais',    institution: 'Una',                   period: null },
 ];
 
+// Checkmark SVG
+const Check = () => (
+  <svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden>
+    <path d="M1 4l2.5 2.5L9 1.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 export default function ExperienceSection() {
   const [experiences, setExperiences] = useState<Experience[]>(FALLBACK_EXPERIENCES);
   const [education, setEducation] = useState<EducationItem[]>(FALLBACK_EDUCATION);
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
     fetch('/api/portfolio/experiences')
@@ -97,65 +106,121 @@ export default function ExperienceSection() {
       .catch(() => {});
   }, []);
 
-  const degrees = education.filter((e) => e.type === 'degree');
+  const exp = experiences[active] ?? experiences[0];
+  const degrees        = education.filter((e) => e.type === 'degree');
   const certifications = education.filter((e) => e.type === 'certification');
 
   return (
     <section id="experiencia" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
 
-        {/* Header */}
+        {/* ── Header ── */}
         <ScrollReveal className="text-center mb-14">
           <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
             Experiência Profissional
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Uma Década Construindo Expertise Real</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Uma Década Construindo{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Expertise Real
+            </span>
+          </h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
             Da infraestrutura ao desenvolvimento full stack — cada etapa adicionou uma camada de profundidade técnica que poucos desenvolvedores têm.
           </p>
         </ScrollReveal>
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500 via-blue-300 to-gray-200" />
+        {/* ── Interactive tab panel ── */}
+        <ScrollReveal>
+          <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+            <div className="flex flex-col lg:flex-row">
 
-          <div className="space-y-10">
-            {experiences.map((exp, index) => (
-              <ScrollReveal key={index} delay={index * 0.1}>
-                <div className="flex gap-6">
-                  {/* Dot */}
-                  <div className="relative shrink-0 mt-1">
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      index === 0
-                        ? 'bg-blue-500 border-blue-500 shadow-[0_0_0_4px_rgba(59,130,246,0.15)]'
-                        : 'bg-white border-gray-300'
-                    }`} />
-                  </div>
+              {/* ── Left: company tab list ── */}
+              <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible lg:w-60 shrink-0 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50/50">
+                {experiences.map((e, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActive(i)}
+                    className={`relative flex flex-col items-start px-5 py-4 text-left transition-colors shrink-0 lg:w-full ${
+                      active === i ? 'bg-white' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {/* Animated active indicator (desktop: left bar) */}
+                    {active === i && (
+                      <motion.div
+                        layoutId="expIndicatorV"
+                        className="absolute left-0 top-0 bottom-0 w-[3px] hidden lg:block rounded-r-full"
+                        style={{ background: 'linear-gradient(to bottom, #3b82f6, #8b5cf6)' }}
+                        transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                      />
+                    )}
+                    {/* Animated active indicator (mobile: bottom bar) */}
+                    {active === i && (
+                      <motion.div
+                        layoutId="expIndicatorH"
+                        className="absolute bottom-0 left-0 right-0 h-[2px] lg:hidden"
+                        style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)' }}
+                        transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                      />
+                    )}
 
-                  {/* Content */}
-                  <div className="flex-1 pb-2">
-                    {/* Role + Period */}
-                    <div className="flex flex-wrap items-baseline justify-between gap-2 mb-0.5">
-                      <h3 className="text-lg font-bold text-gray-900">{exp.position}</h3>
-                      <span className="text-sm text-gray-400 font-medium shrink-0">{exp.period}</span>
+                    <span className={`font-bold text-sm leading-tight ${active === i ? 'text-blue-700' : 'text-gray-700'}`}>
+                      {e.company}
+                    </span>
+                    <span className={`text-xs mt-0.5 line-clamp-1 max-w-[190px] ${active === i ? 'text-blue-500/80' : 'text-gray-400'}`}>
+                      {e.position}
+                    </span>
+                    {i === 0 && (
+                      <span className="mt-1.5 px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded leading-none">
+                        Atual
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* ── Right: detail panel ── */}
+              <div className="flex-1 p-7 lg:p-8 min-h-[340px] bg-white">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={active}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.22, ease: 'easeOut' }}
+                  >
+                    {/* Role + meta */}
+                    <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">{exp.position}</h3>
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          <span className="text-sm font-semibold text-blue-600">{exp.company}</span>
+                          <span className="text-gray-300">·</span>
+                          <span className="text-sm text-gray-400">{exp.period}</span>
+                        </div>
+                      </div>
+                      {active === 0 && (
+                        <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                          Em andamento
+                        </span>
+                      )}
                     </div>
 
-                    {/* Company */}
-                    <p className="text-sm font-semibold text-blue-600 mb-3">{exp.company}</p>
-
                     {/* Description */}
-                    <p className="text-gray-600 text-sm leading-relaxed mb-4">{exp.description}</p>
+                    <p className="text-gray-600 text-sm leading-relaxed mb-6">{exp.description}</p>
 
-                    {/* Highlights */}
-                    <ul className="space-y-1.5 mb-4">
+                    {/* Highlights grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6">
                       {exp.highlights.map((h, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                          <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
-                          <span>{h}</span>
-                        </li>
+                        <div key={i} className="flex items-start gap-2.5">
+                          <span className="w-[18px] h-[18px] rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                            <Check />
+                          </span>
+                          <span className="text-sm text-gray-700 leading-snug">{h}</span>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
 
                     {/* Technologies */}
                     <div className="flex flex-wrap gap-1.5">
@@ -165,18 +230,19 @@ export default function ExperienceSection() {
                         </span>
                       ))}
                     </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
-        {/* Education */}
-        <ScrollReveal delay={0.15} className="mt-16 pt-12 border-t border-gray-100">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Formação Acadêmica</h3>
+        {/* ── Education ── */}
+        <ScrollReveal delay={0.15} className="mt-12">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Formação & Certificações</p>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {degrees.map((d, i) => (
               <div key={i} className="flex items-start gap-4 p-5 rounded-xl border border-blue-100 bg-blue-50">
                 <div className="p-2 bg-blue-100 rounded-lg shrink-0">
@@ -202,7 +268,10 @@ export default function ExperienceSection() {
                   {certifications.map((c, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                       <span className="text-purple-400 shrink-0">•</span>
-                      <span>{c.title}{c.institution ? <span className="text-gray-400"> — {c.institution}</span> : ''}</span>
+                      <span>
+                        {c.title}
+                        {c.institution && <span className="text-gray-400"> — {c.institution}</span>}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -210,6 +279,7 @@ export default function ExperienceSection() {
             )}
           </div>
         </ScrollReveal>
+
       </div>
     </section>
   );

@@ -117,7 +117,7 @@ export default function TestimonialsSection() {
               meu trabalho
             </span>
           </h2>
-          <p className="text-white/35 text-sm">Clique em um card lateral para expandi-lo</p>
+          <p className="text-lg text-white/50 max-w-2xl mx-auto">Clique em um card lateral para navegar entre os depoimentos</p>
         </div>
       </ScrollReveal>
 
