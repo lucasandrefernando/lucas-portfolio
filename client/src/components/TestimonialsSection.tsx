@@ -76,8 +76,9 @@ export default function TestimonialsSection() {
       .catch(() => {});
   }, []);
 
+  const stopTimer  = () => { if (timerRef.current) clearInterval(timerRef.current); };
   const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    stopTimer();
     timerRef.current = setInterval(() => setCurrent((c) => (c + 1) % testimonials.length), 5000);
   };
 
@@ -129,7 +130,20 @@ export default function TestimonialsSection() {
           (compact ≈ 310px, expanded ≈ 380px). Absolute cards don't
           affect section height so overflow is visible inside the section.
         */}
-        <div className="relative min-h-[300px] sm:h-[430px] flex items-center justify-center">
+        <motion.div
+          className="relative min-h-[300px] sm:h-[430px] flex items-center justify-center select-none cursor-grab active:cursor-grabbing"
+          onMouseEnter={stopTimer}
+          onMouseLeave={startTimer}
+          onTouchStart={stopTimer}
+          onPanStart={stopTimer}
+          onPanEnd={(_, info) => {
+            if (Math.abs(info.offset.x) > 50) {
+              info.offset.x > 0 ? prev() : next();
+            } else {
+              startTimer();
+            }
+          }}
+        >
           {testimonials.map((t, i) => {
             const len = testimonials.length;
             let offset = i - current;
@@ -256,7 +270,7 @@ export default function TestimonialsSection() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Navigation arrows */}
         <motion.button

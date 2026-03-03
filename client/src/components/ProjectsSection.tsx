@@ -208,9 +208,10 @@ export default function ProjectsSection() {
             Each non-featured card is clickable → becomes featured.
           */}
           <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-[260px_260px_260px] gap-4"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-[260px_260px_260px] gap-4 select-none"
             onMouseEnter={stopTimer}
             onMouseLeave={startTimer}
+            onTouchStart={stopTimer}
           >
             {ordered.slice(0, 6).map((p, i) => {
               const isLarge  = i === 0;
